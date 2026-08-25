@@ -19,7 +19,7 @@ const usuarios = [
 ];
 
 
-function cadastrar(dados) {
+export function cadastrar(dados) {
 
     const {
         nome,
@@ -80,5 +80,20 @@ function cadastrar(dados) {
     return usuario;
 };
 
-export default { cadastrar };
+export function login(dados){
+    const { matricula, senha } = dados;
 
+    const usuario = usuarios.find(u => u.matricula === matricula);
+
+    if (!usuario) {
+        throw new Error("Matrícula ou senha incorretos");
+    }
+
+    const senhaValida = bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaValida) {
+        throw new Error("Matrícula ou senha incorretos");
+    }
+
+    return usuario;
+}
