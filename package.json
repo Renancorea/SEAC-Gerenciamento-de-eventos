@@ -1,0 +1,26 @@
+{
+  "name": "sec-gerenciamento-de-eventos",
+  "version": "1.0.0",
+  "description": "Sistema de gerenciamento de eventos cientificos e acadêmicos do IFCE.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Renancorea/SEC-Gerenciamento-de-eventos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Renancorea/SEC-Gerenciamento-de-eventos/issues"
+  },
+  "homepage": "https://github.com/Renancorea/SEC-Gerenciamento-de-eventos#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1"
+  }
+}
