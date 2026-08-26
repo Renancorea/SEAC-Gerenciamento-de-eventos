@@ -55,7 +55,7 @@ export function cadastrar(dados) {
     const emailExiste = usuarios.some(
         usuario => usuario.email === email
     );
-
+    // esse some é de someone, alguem em ingles kkkkkk.
     if (emailExiste) {
         throw new Error(
             "Este email já existe"
@@ -63,7 +63,7 @@ export function cadastrar(dados) {
     }
 
      const senhaHash = bcrypt.hash(senha, 10);
-
+    // Mt legal esse bcrypt, hash...
     const usuario = {
         id: usuarios.length + 1,
         nome,
@@ -80,20 +80,3 @@ export function cadastrar(dados) {
     return usuario;
 };
 
-export function login(dados){
-    const { matricula, senha } = dados;
-
-    const usuario = usuarios.find(u => u.matricula === matricula);
-
-    if (!usuario) {
-        throw new Error("Matrícula ou senha incorretos");
-    }
-
-    const senhaValida = bcrypt.compare(senha, usuario.senha);
-
-    if (!senhaValida) {
-        throw new Error("Matrícula ou senha incorretos");
-    }
-
-    return usuario;
-}

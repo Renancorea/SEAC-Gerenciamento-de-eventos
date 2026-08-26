@@ -16,18 +16,4 @@ export function cadastrar(requisicao, resposta) {
     }
 }
 
-export function login(requisicao, resposta) {
-    try {
-        const usuario = servicoUsuario.login(requisicao.body);
 
-        return resposta.status(200).json({
-            mensagem: "Login realizado com sucesso",
-            usuario
-        });
-
-    } catch (erro) {
-        return resposta.status(400).json({
-            mensagem: erro
-        });
-    }
-}
