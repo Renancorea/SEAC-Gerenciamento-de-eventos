@@ -23,6 +23,17 @@ const eventos = [
     }
 ];
 
+const organizadores = [
+    {
+    "nome": "Ana",
+    "matricula": null,
+    "email": "ana@gmail.com",
+    "tipo": 0,
+    "siape": "1234567",
+    "senha": "123456"
+    }
+]
+
 export function cadastrarEvento(dados) {
     const {
         id,
@@ -33,8 +44,10 @@ export function cadastrarEvento(dados) {
         descricao,
         tipo,
         assentos,
-        categoria
+        categoria,
+        idOrganizador
     } = dados;
+
     // descrição opc
     // na pratica podem confundir tipo com categoria
     if (!nome || !local || !data || !horario || !assentos) {
@@ -56,7 +69,8 @@ export function cadastrarEvento(dados) {
         descricao: descricao || "",
         tipo: tipo || "",
         assentos,
-        categoria: categoria || ""
+        categoria: categoria || "",
+        idOrganizador
     };
 
     eventos.push(evento);

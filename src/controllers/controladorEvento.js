@@ -43,8 +43,8 @@ export function listarEventos(requisicao, resposta) {
 export function listarDetalhesEventos(requisicao, resposta) {
 
     try {
-
-        const detalhesEventos = servicoEvento.listarDetalhesEventos();
+        const id = Number(requisicao.params.id);
+        const detalhesEventos = servicoEvento.listarDetalhesEventos(id);
 
         return resposta.status(200).json({
             mensagem: "Detalhes dos eventos listados com sucesso",

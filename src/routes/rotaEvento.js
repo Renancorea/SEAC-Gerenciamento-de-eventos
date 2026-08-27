@@ -8,4 +8,5 @@ router.get("/", listarEventos);
 router.get("/detalhes", listarDetalhesEventos);
 router.put("/editar/:id", editarEvento);
 router.delete("/deletar/:id", deletarEvento);
+
 export default router;
