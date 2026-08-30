@@ -1,8 +1,8 @@
-import servicoAutenticacao from "../services/servicoAutenticacao.js";
+import { login, logout} from "../services/servicoAutenticacao.js";
 
 export function login(requisicao, resposta) {
     try {
-        const usuario = servicoAutenticacao.login(requisicao.body);
+        const usuario = login(requisicao.body);
 
         return resposta.status(200).json({
             mensagem: "Login realizado com sucesso",
@@ -18,7 +18,7 @@ export function login(requisicao, resposta) {
 
 export function logout(resposta) {
     try {
-        servicoAutenticacao.logout();
+        logout();
     
         return resposta.status(200).json({
             mensagem: "Logout realizado com sucesso"
@@ -29,4 +29,4 @@ export function logout(resposta) {
         });
     }
 }
-// Erro no logout é triste
+// Erro no logout é triste kkkkkkkkkkkkkkkkkkkkkkkkk

@@ -45,7 +45,8 @@ export function cadastrarEvento(dados) {
         tipo,
         assentos,
         categoria,
-        idOrganizador
+        idOrganizador,
+        cargaHoraria
     } = dados;
 
     // descrição opc
@@ -60,6 +61,12 @@ export function cadastrarEvento(dados) {
             "O numero de assentos deve ser um natural maior que 0"
         )
     }
+    if (cargaHoraria != null && (!Number.isInteger(cargaHoraria) || cargaHoraria <= 0)) {
+        throw new Error(
+            "A carga horaria deve ser um natural maior que 0"
+        )
+    }
+
     const evento = {
         id: eventos.length + 1,
         nome,
@@ -70,7 +77,8 @@ export function cadastrarEvento(dados) {
         tipo: tipo || "",
         assentos,
         categoria: categoria || "",
-        idOrganizador
+        idOrganizador,
+        cargaHoraria: cargaHoraria || ""
     };
 
     eventos.push(evento);
@@ -80,6 +88,7 @@ export function listarEvento() {
         nome: evento.nome,
         data: evento.data,
         horario: evento.horario,
+        cargaHoraria: evento.cargaHoraria
     }));
 }
 
@@ -114,6 +123,7 @@ export function editarEvento(id, dados) {
         descricao: dados.descricao || "",
         tipo: dados.tipo || "",
         assentos: dados.assentos,
-        categoria: dados.categoria || ""
+        categoria: dados.categoria || "",
+        cargaHoraria: dados.cargaHoraria || ""
     };
 }

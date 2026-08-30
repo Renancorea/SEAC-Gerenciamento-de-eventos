@@ -1,15 +1,98 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <p>Deu certo?</p>
-    <form action="/api/usuarios" method="post">
-        <input type="text" name="nome" placeholder="Nome">
-        <button type="submit">Cadastrar</button>
-    </form>
-</body>
-</html>
+        <html lang="pt-BR">
+        <title>oi</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <head>
+            <meta charset="UTF-8">
+
+            <style>
+/* Isso é o certificado do puptear*/
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                }
+
+                .certificado {
+                    width: 100%;
+                    height: 600px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    border: 10px solid #222;
+                    box-sizing: border-box;
+                    padding: 60px;
+                }
+
+                h1 {
+                    font-size: 42px;
+                    margin-bottom: 40px;
+                }
+
+                .texto {
+                    font-size: 22px;
+                    line-height: 1.6;
+                }
+
+                .nome {
+                    font-size: 32px;
+                    font-weight: bold;
+                    margin: 30px 0 10px;
+                }
+
+                .matricula {
+                    font-size: 20px;
+                    margin-bottom: 30px;
+                }
+
+                .codigo {
+                    margin-top: 50px;
+                    font-size: 14px;
+                }
+
+            </style>
+        </head>
+
+        <body>
+
+            <div class="certificado">
+
+                <h1>ISTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO CEARÁ</h1>
+
+                <div class="texto">
+                    Certificamos que
+                </div>
+
+                <div class="nome">
+                    ${nomeParticipante}
+                </div>
+
+                <div class="matricula">
+                    Matrícula: ${matricula}
+                </div>
+
+                <div class="texto">
+                    participou do evento
+                    <strong>${nomeEvento}</strong>,
+                    realizado em ${dataEvento}.
+                </div>
+
+                            <div class="texto">
+                                
+                            Carga horária: ${cargaHoraria} horas.
+                        </div>`
+                        
+                
+
+                <div class="codigo">
+                    Código de autenticidade: ${codigo}
+                </div>
+
+            </div>
+
+        </body>
+
+        </html>

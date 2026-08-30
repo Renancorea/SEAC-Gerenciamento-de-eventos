@@ -1,8 +1,8 @@
-import servicoUsuario from "../services/servicoUsuario.js";
+import { cadastrar } from "../services/servicoUsuario.js";
 
 export function cadastrar(requisicao, resposta) {
     try {
-        const usuario = servicoUsuario.cadastrar(requisicao.body);
+        const usuario = cadastrar(requisicao.body);
 
         return resposta.status(201).json({
             mensagem: "Usuário cadastrado com sucesso",

@@ -1,10 +1,10 @@
-const servicoEvento = require("../services/servicoEvento.js");
+import { cadastrarEvento, deletarEvento, editarEvento, listarDetalhesEvento, listarEvento } from "../services/servicoEvento.js";
 
 export function cadastrarEvento(requisicao, resposta) {
 
     try {
 
-        const evento = servicoEvento.cadastrarEvento(requisicao.body);
+        const evento = cadastrarEvento(requisicao.body);
 
         return resposta.status(201).json({
             mensagem: "Evento cadastrado com sucesso",
@@ -24,7 +24,7 @@ export function listarEventos(requisicao, resposta) {
 
     try {
 
-        const eventos = servicoEvento.listarEventos();
+        const eventos = listarEventos();
 
         return resposta.status(200).json({
             mensagem: "Eventos listados com sucesso",
@@ -44,7 +44,7 @@ export function listarDetalhesEventos(requisicao, resposta) {
 
     try {
         const id = Number(requisicao.params.id);
-        const detalhesEventos = servicoEvento.listarDetalhesEventos(id);
+        const detalhesEventos = listarDetalhesEvento(id);
 
         return resposta.status(200).json({
             mensagem: "Detalhes dos eventos listados com sucesso",
@@ -64,7 +64,7 @@ export function editarEvento(requisicao, resposta) {
 
     try {
 
-        const eventoEditado = servicoEvento.editarEvento(requisicao.params.id, requisicao.body);
+        const eventoEditado = editarEvento(requisicao.params.id, requisicao.body);
 
         return resposta.status(200).json({
             mensagem: "Evento editado com sucesso",
@@ -84,7 +84,7 @@ export function deletarEvento(requisicao, resposta) {
 
     try {
 
-        servicoEvento.deletarEvento(requisicao.params.id);
+        deletarEvento(requisicao.params.id);
 
         return resposta.status(200).json({
             mensagem: "Evento deletado com sucesso"

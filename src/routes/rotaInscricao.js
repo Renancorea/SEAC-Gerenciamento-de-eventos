@@ -1,8 +1,7 @@
-import express from "express";
-
+import { Router } from "express";
 import { realizarInscricao, registrarPresenca, vizualizarInscritos } from "../controllers/controladorInscricao.js";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/inscricao", realizarInscricao);
 router.put("/presenca", registrarPresenca);

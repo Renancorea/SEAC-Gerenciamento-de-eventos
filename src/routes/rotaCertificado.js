@@ -1,8 +1,7 @@
-import express from "express";
-
+import { Router } from "express";
 import { gerarCertificado } from "../controllers/controladorCertificado.js";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/", gerarCertificado);
 

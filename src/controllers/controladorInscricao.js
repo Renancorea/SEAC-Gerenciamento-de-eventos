@@ -1,4 +1,4 @@
-import { inscrever, registrarPresenca, listarInscritos,} from "../services/participacao.service.js";
+import { inscrever, registrarPresenca, listarInscritos,} from "../services/servicoInscricao.js";
 import { listarDetalhesEvento } from "../services/servicoEvento.js";
 
 export function realizarInscricao(requisicao, resposta) {

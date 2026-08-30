@@ -3,14 +3,14 @@ import bycrypt from "bcryptjs";
 const usuarios = [
     {
     "nome": "Renan",
-    "matricula": null,
+    "matricula": "2024001",
     "email": "renan@gmail.com",
     "tipo": 1,
     "senha": "123456"
 },
 {
     "nome": "Ana",
-    "matricula": "2024034",
+    "matricula": null,
     "email": "ana@gmail.com",
     "tipo": 0,
     "siape": "1234567",
@@ -93,7 +93,7 @@ export function cadastrar(dados) {
     }
         
      const senhaHash = bcrypt.hash(senha, 10);
-    // Mt legal esse bcrypt, hash...
+    // Mt legal esse bcrypt, hash nem...
 
     const usuario = {
         id: usuarios.length + 1,

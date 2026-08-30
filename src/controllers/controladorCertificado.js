@@ -1,4 +1,4 @@
-import { gerarCertificado } from "../services/certificado.service.js";
+import { gerarCertificado } from "../services/servicoCertificado.js";
 
 
 export async function gerarCertificado(requisicao, resposta) {
