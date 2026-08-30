@@ -46,7 +46,7 @@ export function relatorioUsuariosEvento(requisicao, resposta) {
         const relatorio = relatorioUsuariosEvento(usuarioId);
 
         return resposta.status(200).json({
-            mensagem: "Relatório de eventos do usuário gerado com sucesso", relatorio
+            mensagem: "Relatório de usuarios em um evento gerado com sucesso", relatorio
         });
 
     } catch (erro) {
