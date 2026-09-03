@@ -8,7 +8,9 @@ const eventos = [
     descricao: "Musicas e talentos",
     tipo: "seinao",
     assentos: 100,
-    categoria: "Cultural"
+    categoria: "Cultural",
+    idOrganizador: 1,
+    cargaHoraria: 2
     },
     {
     id: 2,
@@ -19,12 +21,31 @@ const eventos = [
     descricao: "Autismo e inclusão",
     tipo: "Palestra",
     assentos: 100,
-    categoria: "saude e cultura"
+    categoria: "saude e cultura",
+    idOrganizador: 1,
+    cargaHoraria: 2
     }
 ];
-
+const usuarios = [
+    {
+    "nome": "Renan",
+    "matricula": "2024001",
+    "email": "renan@gmail.com",
+    "tipo": 1,
+    "senha": "123456"
+},
+{
+    "nome": "Ana",
+    "matricula": null,
+    "email": "ana@gmail.com",
+    "tipo": 0,
+    "siape": "1234567",
+    "senha": "123456"
+}
+];
 const organizadores = [
     {
+    "id": 1,
     "nome": "Ana",
     "matricula": null,
     "email": "ana@gmail.com",
@@ -36,7 +57,6 @@ const organizadores = [
 
 export function cadastrarEvento(dados) {
     const {
-        id,
         nome,
         local,
         data,
@@ -67,6 +87,14 @@ export function cadastrarEvento(dados) {
         )
     }
 
+     const organizador = organizadores.find(
+        organizador => organizador.id === idOrganizador
+    );
+
+    if (!organizador) {
+        throw new Error("Organizador não encontrado");
+    }
+
     const evento = {
         id: eventos.length + 1,
         nome,
@@ -78,17 +106,18 @@ export function cadastrarEvento(dados) {
         assentos,
         categoria: categoria || "",
         idOrganizador,
-        cargaHoraria: cargaHoraria || ""
+        cargaHoraria: cargaHoraria
     };
 
     eventos.push(evento);
 }
-export function listarEvento() {
+export function listarEventos() {
     return eventos.map(evento => ({
         nome: evento.nome,
         data: evento.data,
         horario: evento.horario,
-        cargaHoraria: evento.cargaHoraria
+        cargaHoraria: evento.cargaHoraria,
+        nomeOrganizador: organizadores.find(a => a.id === evento.idOrganizador)?.nome || "Desconhecido"
     }));
 }
 
@@ -97,25 +126,54 @@ export function listarDetalhesEvento(id) {
     if (!evento) {
         throw new Error("Evento não encontrado");
     }
-    return evento;
+
+      const organizador = organizadores.find(
+        organizador => organizador.id === evento.idOrganizador
+    );
+
+    return{
+    ...evento,
+    nomeOrganizador: organizador?.nome || "Desconhecido"
+    };
+    // esses 3 pontos cria um novo objeto adicionando outro breguesse
 }
 
-export function deletarEvento(id) {
+export function deletarEvento(id, idOrganizador) {
+
     const index = eventos.findIndex(evento => evento.id === id);
     if (index === -1) {
         throw new Error("Evento não encontrado");
     }
+
+    const evento = eventos[index];
+    if (evento.idOrganizador !== idOrganizador) {
+        throw new Error(
+            "Você não pode remover este evento"
+        );
+    }
+
     eventos.splice(index, 1);
 }
 // findIndex retorna o index, se não acahr ele da  -1
 
-export function editarEvento(id, dados) {
-    const index = eventos.findIndex(evento => evento.id === id);
+export function editarEvento(idEvento, idOrganizador, dados) {
+
+    const index = eventos.findIndex(evento => evento.id === idEvento);
+
     if (index === -1) {
         throw new Error("Evento não encontrado");
     }
+
+    const evento = eventos[index];
+
+    if (evento.idOrganizador !== idOrganizador) {
+        throw new Error(
+            "Você não pode editar este evento"
+        );
+    }
+
     eventos[index] = {
-        id: dados.id,
+        id: idEvento,
         nome: dados.nome,
         local: dados.local,
         data: dados.data,
@@ -124,6 +182,52 @@ export function editarEvento(id, dados) {
         tipo: dados.tipo || "",
         assentos: dados.assentos,
         categoria: dados.categoria || "",
-        cargaHoraria: dados.cargaHoraria || ""
+        idOrganizador: evento.idOrganizador,
+        cargaHoraria: dados.cargaHoraria || "",
     };
 }
+
+export function pesquisarEventos(pesquisa) {
+
+    pesquisa = pesquisa.toLowerCase();
+
+    const resultado = eventos.filter(evento => {
+
+        const nomeOrganizador = usuarios.find(a => a.id === evento.idOrganizador)?.nome.toLowerCase() || "Sem";
+        
+        return (
+            evento.nome.toLowerCase().includes(pesquisa) ||
+            nomeOrganizador.includes(pesquisa)
+        );
+    });
+
+    return resultado;
+}
+
+export function filtrarEventos(tipo, data, categoria, cargaHoraria) {
+
+    let resultado = eventos;
+
+      if (tipo) {
+        resultado = resultado.filter(
+            evento => evento.tipo === tipo
+        );
+    }
+
+    if (categoria) {
+        resultado = resultado.filter(
+            evento => evento.categoria === categoria
+        );
+    }
+    if (cargaHoraria) {
+        resultado = resultado.filter(
+            evento => evento.cargaHoraria === cargaHoraria
+        );
+    }
+
+    resultado.sort(
+        (a, b) => new Date(a.data) - new Date(b.data)
+    );
+
+    return resultado;
+};

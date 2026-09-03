@@ -1,9 +1,10 @@
-import { cadastrarEvento, deletarEvento, editarEvento, listarDetalhesEvento, listarEvento } from "../services/servicoEvento.js";
+import { filtrarEventos, pesquisarEventos, cadastrarEvento, deletarEvento, editarEvento, listarDetalhesEvento, listarEventos } from "../services/servicoEvento.js";
+
 
 export function cadastrarEvento(requisicao, resposta) {
 
     try {
-
+        
         const evento = cadastrarEvento(requisicao.body);
 
         return resposta.status(201).json({
@@ -40,7 +41,7 @@ export function listarEventos(requisicao, resposta) {
     }
 }
 
-export function listarDetalhesEventos(requisicao, resposta) {
+export function listarDetalhesEvento(requisicao, resposta) {
 
     try {
         const id = Number(requisicao.params.id);
@@ -64,7 +65,7 @@ export function editarEvento(requisicao, resposta) {
 
     try {
 
-        const eventoEditado = editarEvento(requisicao.params.id, requisicao.body);
+        const eventoEditado = editarEvento(requisicao.params.id, requisicao.body.idOrganizador, requisicao.body);
 
         return resposta.status(200).json({
             mensagem: "Evento editado com sucesso",
@@ -84,7 +85,7 @@ export function deletarEvento(requisicao, resposta) {
 
     try {
 
-        deletarEvento(requisicao.params.id);
+        deletarEvento(requisicao.params.id, requisicao.body.idOrganizador);
 
         return resposta.status(200).json({
             mensagem: "Evento deletado com sucesso"
@@ -98,3 +99,45 @@ export function deletarEvento(requisicao, resposta) {
 
     }
 }
+
+export function pesquisarEventos(requisicao, resposta) {
+
+    try {
+
+        const pesquisa = requisicao.query.pesquisa;
+        const eventosEncontrados = pesquisarEventos(pesquisa);
+
+        return resposta.status(200).json({
+            mensagem: "Eventos encontrados com sucesso",
+            eventosEncontrados
+        });
+
+    } catch (erro) {
+
+        return resposta.status(400).json({
+            mensagem: erro.message
+        });
+
+    }
+}
+
+export function filtrarEventos(requisicao, resposta) {
+
+    try {
+
+        const filtro = requisicao.query.filtro;
+        const eventosFiltrados = filtrarEventos(filtro);
+
+        return resposta.status(200).json({
+            mensagem: "Eventos filtrados com sucesso",
+            eventosFiltrados
+        });
+
+    } catch (erro) {
+
+        return resposta.status(400).json({
+            mensagem: erro.message
+        });
+
+    }
+};

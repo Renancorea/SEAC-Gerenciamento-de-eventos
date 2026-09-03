@@ -1,4 +1,4 @@
-import { inscrever, registrarPresenca, listarInscritos,} from "../services/servicoInscricao.js";
+import { inscrever, registrarPresenca, listarInscritos, listarPresentes, verificarInscricao} from "../services/servicoInscricao.js";
 import { listarDetalhesEvento } from "../services/servicoEvento.js";
 
 export function realizarInscricao(requisicao, resposta) {
@@ -65,6 +65,45 @@ export function vizualizarInscritos(requisicao, resposta) {
             eventoId,
             evento.assentos
         );
+
+        return resposta.status(200).json(resultado);
+
+    } catch (erro) {
+
+        return resposta.status(404).json({
+            mensagem: erro.message
+        });
+
+    }
+}
+
+export function vizualizarPresentes(requisicao, resposta) {
+
+    try {
+
+        const eventoId = Number(requisicao.params.eventoId);
+
+        const resultado = listarPresentes(eventoId);
+
+        return resposta.status(200).json(resultado);
+
+    } catch (erro) {
+
+        return resposta.status(404).json({
+            mensagem: erro.message
+        });
+
+    }
+}
+
+export function verificarInscricaoUsuario(requisicao, resposta) {
+
+    try {
+
+        const usuarioId = Number(requisicao.params.usuarioId);
+        const eventoId = Number(requisicao.params.eventoId);
+
+        const resultado = verificarInscricao(usuarioId, eventoId);
 
         return resposta.status(200).json(resultado);
 

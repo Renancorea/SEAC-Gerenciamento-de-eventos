@@ -31,12 +31,12 @@ export function inscrever(usuarioId, eventoId) {
     );
     }
 
-export function inscrever(usuarioId, eventoId) {
+export function inscrever(idUsuario, idEvento) {
 
     const existe = participacoes.find(
         participacao =>
-            participacao.usuarioId === usuarioId &&
-            participacao.eventoId === eventoId
+            participacao.usuarioId === idUsuario &&
+            participacao.eventoId === idEvento
     );
 
     if (existe) {
@@ -59,12 +59,12 @@ export function inscrever(usuarioId, eventoId) {
 }
 
 
-export function registrarPresenca(usuarioId, eventoId) {
+export function registrarPresenca(idUsuario, idEvento) {
 
     const participacao = participacoes.find(
         participacao =>
-            participacao.usuarioId === usuarioId &&
-            participacao.eventoId === eventoId
+            participacao.usuarioId === idUsuario &&
+            participacao.eventoId === idEvento
     );
 
     if (!participacao) {
@@ -78,33 +78,54 @@ export function registrarPresenca(usuarioId, eventoId) {
     return participacao;
 }
 
-
-export function listarInscritos(eventoId, quantidadeVagas) {
+// REVISAr esse negocio
+export function listarInscritos(idEvento, assentos) {
 
     const inscritos = participacoes.filter(
         participacao =>
-            participacao.eventoId === eventoId &&
+            participacao.eventoId === idEvento &&
             participacao.inscrito === true
     );
 
     return {
-        quantidadeInscritos: inscritos.length,
-        vagasDisponiveis: quantidadeVagas - inscritos.length,
-        inscritos
+        inscritos: inscritos.length,
+        assentosDisponiveis: assentos - inscritos.length,
+        inscritos: participacoes
     };
 }
 
 
-export function listarPresentes(eventoId) {
+export function listarPresentes(idEvento) {
 
     const presentes = participacoes.filter(
         participacao =>
-            participacao.eventoId === eventoId &&
+            participacao.eventoId === idEvento &&
             participacao.presente === true
     );
 
     return {
         quantidadePresentes: presentes.length,
         presentes
+    };
+}
+
+export function verificarInscricao(idUsuario, idEvento) {
+
+    const participacao = participacoes.find(
+        participacao =>
+            participacao.usuarioId === idUsuario &&
+            participacao.eventoId === idEvento
+    );
+
+    if (!participacao) {
+        return {
+            inscrito: false,
+            presente: false
+        };
+    }
+
+    return {
+        inscrito: participacao.inscrito,
+        presente: participacao.presente
     };
 }

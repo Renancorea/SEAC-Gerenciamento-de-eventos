@@ -18,7 +18,7 @@ app.use("/api/certificados", rotaCertificado);
 app.use("/api/relatorios", rotaRelatorio);
 app.use("/api/certificados", rotaCertificado);
 
-
-app.listen(3000, () => {
-    console.log("Servidor rodando na porta 3000");
+const porta = 3000;
+app.listen(porta, () => {
+    console.log(`Servidor rodando na porta ${porta}`);
 });
