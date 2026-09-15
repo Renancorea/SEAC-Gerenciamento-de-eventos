@@ -1,0 +1,351 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f3f5f4;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column
+}
+
+.barra-governo {
+    height: 36px;
+    background: #eee;
+    border-bottom: 1px solid #d8d8d8
+}
+
+.conteudo-governo {
+    max-width: 1180px;
+    height: 100%;
+    margin: auto;
+    padding: 0 25px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 12px;
+    color: #555
+}
+
+.cabecalho {
+    background: #176b36;
+    border-bottom: 4px solid #0f5429
+}
+
+.cabecalho-conteudo {
+    max-width: 1180px;
+    min-height: 95px;
+    margin: auto;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.logo-ifce-area,
+.logo-seac-area {
+    display: flex;
+    align-items: center
+}
+
+.logo-ifce-area {
+    gap: 15px
+}
+
+.logo-seac-area {
+    gap: 14px;
+    color: #fff;
+    text-align: right
+}
+
+.logo-ifce {
+    width: 75px;
+    height: 65px;
+    object-fit: contain
+}
+
+.logo-seac {
+    width: 60px;
+    height: 60px;
+    object-fit: contain
+}
+
+.texto-ifce,
+.texto-seac {
+    color: #fff
+}
+
+.texto-ifce strong {
+    display: block;
+    font-size: 20px
+}
+
+.texto-ifce span {
+    display: block;
+    font-size: 16px;
+    margin-top: 3px
+}
+
+.texto-seac strong {
+    display: block;
+    font-size: 27px
+}
+
+.texto-seac span {
+    display: block;
+    font-size: 13px;
+    margin-top: 3px;
+    opacity: .9
+}
+
+.principal {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 45px 20px
+}
+
+.card {
+    max-width: 560px;
+    width: 100%;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    border-top: 5px solid #176b36;
+    box-shadow: 0 5px 22px rgba(0, 0, 0, .12)
+}
+
+.titulo {
+    text-align: center;
+    color: #176b36;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 5px
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px
+}
+
+.descricao {
+    text-align: center;
+    color: #777;
+    margin-bottom: 30px
+}
+
+.campo {
+    margin-bottom: 18px
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333
+}
+
+.campo input,
+.campo select {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    background: #fff
+}
+
+.campo input:focus,
+.campo select:focus {
+    border-color: #176b36;
+    box-shadow: 0 0 0 2px rgba(23, 107, 54, .1)
+}
+
+button {
+    font-family: inherit
+}
+
+.esqueceu {
+    display: block;
+    text-align: right;
+    margin-top: -5px;
+    margin-bottom: 20px;
+    color: #176b36;
+    text-decoration: none;
+    font-size: 14px
+}
+
+.esqueceu:hover {
+    text-decoration: underline
+}
+
+.botao-entrar,
+.botao-cadastrar {
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-radius: 6px;
+    background: #176b36;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer
+}
+
+.botao-entrar:hover,
+.botao-cadastrar:hover {
+    background: #12552b
+}
+
+.ou {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 25px 0
+}
+
+.ou:before,
+.ou:after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ddd
+}
+
+.ou span {
+    color: #777;
+    font-size: 13px
+}
+
+.login-social {
+    display: flex;
+    flex-direction: column;
+    gap: 12px
+}
+
+.botao-google,
+.botao-facebook {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer
+}
+
+.botao-google {
+    border: 1px solid #ccc;
+    color: #333
+}
+
+.botao-google:hover {
+    background: #f7f7f7
+}
+
+.botao-facebook {
+    border: 1px solid #1877f2;
+    color: #1877f2
+}
+
+.botao-facebook:hover {
+    background: #f1f6ff
+}
+
+.botao-google img,
+.botao-facebook img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain
+}
+
+.separador {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 28px 0 22px
+}
+
+.cadastro,
+.login {
+    text-align: center
+}
+
+.cadastro p,
+.login p {
+    color: #666;
+    margin-bottom: 12px
+}
+
+.botao-cadastro,
+.botao-login {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #176b36;
+    border-radius: 6px;
+    background: #fff;
+    color: #176b36;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold
+}
+
+.botao-cadastro:hover,
+.botao-login:hover {
+    background: #eef7f0
+}
+
+footer {
+    background: #176b36;
+    color: #fff
+}
+
+.rodape {
+    max-width: 1180px;
+    margin: auto;
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 12px
+}
+
+.rodape span {
+    opacity: .9
+}
+
+@media(max-width:650px) {
+    .cabecalho-conteudo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px
+    }
+
+    .logo-seac-area {
+        text-align: left
+    }
+
+    .card {
+        padding: 30px 24px
+    }
+
+    .rodape {
+        flex-direction: column;
+        align-items: flex-start
+    }
+}

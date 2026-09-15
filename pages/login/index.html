@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEAC - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- CABEÇALHO -->
+    <header class="cabecalho">
+        <div class="logo-seac">
+            <img src="../imagens/SEAC.png.jpeg" alt="Logo SEAC">
+        </div>
+
+        <a href="../cadastro/" class="botao-cadastro">
+            Cadastre-se
+        </a>
+    </header>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="login-container">
+
+        <!-- LADO ESQUERDO -->
+        <section class="lado-esquerdo">
+
+            <div class="circulo circulo-1"></div>
+            <div class="circulo circulo-2"></div>
+            <div class="circulo circulo-3"></div>
+
+            <div class="mensagem">
+                <h1>
+                    "Educação não<br>
+                    transforma o mundo.<br>
+                    Educação muda<br>
+                    pessoas.<br>
+                    Pessoas transformam<br>
+                    o mundo"
+                </h1>
+
+                <p>— Paulo Freire</p>
+            </div>
+
+            <div class="logo-ifce">
+                <img src="../imagens/IFCE.png.png" alt="IFCE">
+            </div>
+
+        </section>
+
+
+        <!-- LADO DIREITO -->
+        <section class="lado-direito">
+
+            <div class="formulario">
+
+                <h2>Bem-vindo de volta!</h2>
+
+                <p class="subtitulo">
+                    Faça seu login para continuar
+                </p>
+
+
+                <!-- PARTICIPANTE / ORGANIZADOR -->
+                <div class="tipos">
+
+                    <button
+                        type="button"
+                        id="btnParticipante"
+                        class="tipo ativo">
+                        Participante
+                    </button>
+
+                    <button
+                        type="button"
+                        id="btnOrganizador"
+                        class="tipo">
+                        Organizador
+                    </button>
+
+                </div>
+
+
+                <!-- MATRÍCULA / SIAPE -->
+                <label id="labelIdentificacao">
+                    Matrícula
+                </label>
+
+                <input
+                    type="text"
+                    id="identificacao"
+                    placeholder="Digite sua matrícula"
+                >
+
+
+                <!-- SENHA -->
+                <label>
+                    Senha
+                </label>
+
+                <div class="campo-senha">
+
+                    <input
+                        type="password"
+                        placeholder="Digite sua senha"
+                    >
+
+                    <span>👁</span>
+
+                </div>
+
+
+                <!-- ESQUECEU SENHA -->
+                <a href="#" class="esqueci">
+                    Esqueceu sua senha?
+                </a>
+
+
+                <!-- ENTRAR -->
+                <button type="button" class="botao-entrar">
+                    Entrar
+                </button>
+
+
+                <!-- OU -->
+                <div class="separador">
+
+                    <span></span>
+
+                    <p>ou</p>
+
+                    <span></span>
+
+                </div>
+
+
+                <!-- GOOGLE + SUAP -->
+                <div class="login-opcoes">
+
+                    <button type="button" class="opcao-social">
+                        <img
+                            src="../imagens/google.png"
+                            alt="Google"
+                        >
+                    </button>
+
+                    <button type="button" class="opcao-social">
+                        <img
+                            src="../imagens/suap.ifrr.edu.br 1.png"
+                            alt="SUAP"
+                        >
+                    </button>
+
+                </div>
+
+
+                <!-- CADASTRO -->
+                <p class="texto-cadastro">
+                    Ainda não possui uma conta?
+                </p>
+
+                <a
+                    href="../cadastro/"
+                    class="botao-criar-conta">
+                    Criar uma conta
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- RODAPÉ -->
+    <footer class="rodape">
+
+        <span>
+            Instituto Federal de Educação, Ciência e Tecnologia do Ceará
+        </span>
+
+        <span>
+            SEAC - Sistema de Eventos Acadêmicos
+        </span>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>

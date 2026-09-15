@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEAC - Cadastro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="barra-governo">
+        <div class="conteudo-governo"><span>BRASIL</span><span>Governo Federal</span></div>
+    </div>
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <div class="logo-ifce-area"><img src="../imagens/IFCE.png.png" alt="Símbolo do IFCE" class="logo-ifce">
+
+                <div class="texto-ifce"><strong>Instituto Federal</strong>
+                    <span>do Ceará</span>
+                
+                </div>
+
+            </div>
+
+            <div class="logo-seac-area"><img src="../imagens/SEAC.png.jpeg" alt="Símbolo do SEAC" class="logo-seac">
+
+                <div class="texto-seac"><strong>SEAC</strong><span>Sistema de Eventos Acadêmicos</span>
+                
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <main class="principal">
+        <div class="card">
+            <div class="titulo">SEAC</div>
+            <h1>Cadastro</h1>
+            <p class="descricao">Crie sua conta para acessar o sistema</p>
+            <form>
+                <div class="campo"><label for="nome">Nome completo</label>
+
+                    <input type="text" id="nome"
+
+                        placeholder="Digite seu nome completo">
+                    
+                    </div>
+                <div class="campo"><label for="matricula">Matrícula</label>
+                    
+                    <input type="text" id="matricula"
+                        placeholder="Digite sua matrícula">
+                    
+                    </div>
+
+                <div class="campo"><label for="email">E-mail</label>
+                    <input type="email" id="email"
+                        placeholder="Digite seu e-mail">
+                    
+                    </div>
+                <div class="campo"><label for="tipo">Tipo de usuário</label><select id="tipo">
+
+
+                        <option value="">Selecione o tipo de usuário</option>
+
+                        <option value="participante">Participante</option>
+
+                        <option value="organizador">Organizador</option>
+                    </select>
+                
+                </div>
+                <div class="campo"><label for="senha">Senha</label>
+                    <input type="password" id="senha"
+                        placeholder="Digite sua senha">
+                    </div>
+                <div class="campo"><label for="confirmar">Confirmar senha</label><input type="password" id="confirmar"
+
+                        placeholder="Digite sua senha novamente">
+                    
+                      </div>
+                <button type="submit" class="botao-cadastrar">Cadastrar</button>
+
+            </form>
+
+            <div class="separador"></div>
+            <div class="login">
+                <p>Já possui uma conta?</p><a href="../login/" class="botao-login">Voltar para o Login</a>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="rodape"><strong>Instituto Federal de Educação, Ciência e Tecnologia do Ceará</strong><span>SEAC -
+                Sistema de Eventos Acadêmicos</span></div>
+    </footer>
+</body>
+
+</html>
