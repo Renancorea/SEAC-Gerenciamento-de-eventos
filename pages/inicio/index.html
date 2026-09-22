@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEAC - Início</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="cabecalho">
+        <a href="./" class="marca" aria-label="Página inicial SEAC">
+            <img src="../imagens/SE AC.png.png" alt="SEAC">
+        </a>
+
+        <div class="busca">
+            <span class="icone-busca">⌕</span>
+            <input id="campoBusca" type="search" placeholder="Buscar eventos ou organizadores..." autocomplete="off">
+        </div>
+
+        <nav class="acoes">
+            <a href="../login/" class="link-entrar">Entrar</a>
+            <a href="../cadastro/" class="botao-topo">Cadastre-se</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="decoracao circulo-hero-1"></div>
+            <div class="decoracao circulo-hero-2"></div>
+            <div class="decoracao circulo-hero-3"></div>
+
+            <div class="hero-texto">
+                <h1>SEAC</h1>
+                <h2>Sistema de Eventos<br>Acadêmicos e Científicos</h2>
+
+                <div class="hero-botoes">
+                    <a href="#eventos" class="botao-principal">Ver Eventos</a>
+                    <a href="../cadastro/" class="botao-secundario">Criar conta</a>
+                </div>
+            </div>
+
+            <div class="capelo" aria-hidden="true">
+                <div class="capelo-topo"><span>IFCE</span></div>
+                <div class="capelo-base"></div>
+                <div class="capelo-borda"></div>
+                <div class="capelo-corda"></div>
+            </div>
+        </section>
+
+        <section class="catalogo" id="eventos">
+            <div class="cabecalho-catalogo">
+                <div>
+                    <h2>Catálogo de Eventos</h2>
+                    <p id="contadorEventos">4 Eventos encontrados</p>
+                </div>
+
+                <div class="filtros">
+                    <select id="filtroTipo" aria-label="Filtrar por tipo">
+                        <option value="todos">Todos os tipos</option>
+                        <option value="cientifico">Científico</option>
+                        <option value="academico">Acadêmico</option>
+                        <option value="cultural">Cultural</option>
+                    </select>
+
+                    <select id="ordenacao" aria-label="Ordenar eventos">
+                        <option value="padrao">Ordenar por Data</option>
+                        <option value="asc">Data mais próxima</option>
+                        <option value="desc">Data mais distante</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grade-eventos" id="gradeEventos">
+                <article class="evento-card" data-tipo="cientifico" data-data="2026-09-23" data-busca="nome do evento organizador local">
+                    <div class="imagem-evento floresta-1">
+                     
+                         <div class="data-evento">
+            25
+            <span>Set</span>
+        </div>
+
+        <div class="tipo-evento">
+            Tipo
+        </div>
+                        
+                        <span class="etiqueta-tipo">Tipo</span>
+                        <span class="data-evento"><strong>23</strong><small>Set</small></span>
+                       
+                    </div>
+                    <div class="conteudo-evento">
+                        <h3>Nome do evento</h3>
+                       
+                        <p class="organizador">Nome do organizador</p>
+                      <span class="local-evento">
+    <img src="../imagens/localização.png.png" alt="Local">
+    Local
+</span>
+                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+                    </div>
+                </article>
+
+                <article class="evento-card" data-tipo="academico" data-data="2026-09-25" data-busca="nome do evento organizador local">
+                    <div class="imagem-evento floresta-2">
+
+                               <div class="data-evento">
+            25
+            <span>Set</span>
+        </div>
+
+        <div class="tipo-evento">
+            Tipo
+        </div>
+
+                        <span class="etiqueta-tipo">Tipo</span>
+                        <span class="data-evento"><strong>25</strong><small>Set</small></span>
+                    </div>
+                    <div class="conteudo-evento">
+                        <h3>Nome do evento</h3>
+                        <p class="organizador">Nome do organizador</p>
+                         <p class="organizador">Nome do organizador</p>
+
+
+
+                      <span class="local-evento">
+    <img src="../imagens/localização.png.png" alt="Local">
+    Local
+</span>
+                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+                    </div>
+                </article>
+
+                <article class="evento-card" data-tipo="cultural" data-data="2026-09-27" data-busca="nome do evento organizador local">
+                    <div class="imagem-evento floresta-3">
+                      
+<div class="data-evento">
+            25
+            <span>Set</span>
+        </div>
+
+        <div class="tipo-evento">
+            Tipo
+        </div>
+                        
+                        <span class="etiqueta-tipo">Tipo</span>
+                        <span class="data-evento"><strong>27</strong><small>Set</small></span>
+                    </div>
+                    <div class="conteudo-evento">
+                        <h3>Nome do evento</h3>
+                        <p class="organizador">Nome do organizador</p>
+                
+                     <span class="local-evento">
+                       <img src="../imagens/localização.png.png" alt="Local">
+                        Local
+</span>
+
+                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+                    </div>
+                </article>
+
+                <article class="evento-card" data-tipo="cientifico" data-data="2026-09-30" data-busca="nome do evento organizador local">
+                    <div class="imagem-evento floresta-4">
+                          
+                    <div class="data-evento">
+            25
+            <span>Set</span>
+        </div>
+
+        <div class="tipo-evento">
+            Tipo
+        </div>
+
+                        <span class="etiqueta-tipo">Tipo</span>
+                        <span class="data-evento"><strong>30</strong><small>Set</small></span>
+                    </div>
+                    <div class="conteudo-evento">
+                        <h3>Nome do evento</h3>
+                        <p class="organizador">Nome do organizador</p>
+
+                          <span class="local-evento">
+                       <img src="../imagens/localização.png.png" alt="Local">
+                        Local
+</span>
+
+
+                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+                    </div>
+                </article>
+            </div>
+
+            <p class="sem-resultados" id="semResultados">Nenhum evento encontrado.</p>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <div class="rodape-marca">
+            <div class="logo-rodape">
+                <img src="../imagens/LOGO.png.png" alt="SEAC">
+                <strong>SEAC</strong>
+            </div>
+            <p>Plataforma oficial de eventos<br>científicos e acadêmicos do<br>Instituto Federal Campus Cedro</p>
+        </div>
+
+        <div class="rodape-coluna">
+            <h3>NAVEGAÇÃO</h3>
+            <a href="#eventos">Catálogo de eventos</a>
+            <a href="../login/">Entrar</a>
+            <a href="../cadastro/">Criar conta</a>
+        </div>
+
+        <div class="rodape-coluna">
+            <h3>DESENVOLVEDORES</h3>
+            <span>Renan</span>
+            <span>Lucca</span>
+            <span>Felipe</span>
+            <span>Samaya</span>
+        </div>
+
+        <div class="linha-rodape"></div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
