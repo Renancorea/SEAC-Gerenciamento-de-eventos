@@ -182,26 +182,54 @@ body {
     margin-bottom: 28px;
 }
 
-
+/* SELETOR PARTICIPANTE / ORGANIZADOR */
 
 .tipos {
+    position: relative;
+
     display: flex;
 
     width: 100%;
+    height: 48px;
 
-    border: 1px solid #cfd5ce;
+    background: #eef1ed;
 
     border-radius: 25px;
 
-    padding: 3px;
+    padding: 4px;
 
     margin-bottom: 25px;
+
+    overflow: hidden;
+}
+
+.indicador {
+    position: absolute;
+
+    top: 4px;
+    left: 4px;
+
+    width: calc(50% - 4px);
+    height: 40px;
+
+    background: #123a27;
+
+    border-radius: 22px;
+
+    transition: transform 0.3s ease;
+
+    pointer-events: none;
+
+    z-index: 1;
 }
 
 .tipo {
-    width: 50%;
+    position: relative;
 
-    height: 42px;
+    z-index: 2;
+
+    width: 50%;
+    height: 40px;
 
     border: none;
 
@@ -209,21 +237,20 @@ body {
 
     border-radius: 22px;
 
+    color: #59615c;
+
     font-size: 14px;
+    font-weight: normal;
 
     cursor: pointer;
 
-    color: #59615c;
+    transition: color 0.3s ease;
 }
 
 .tipo.ativo {
-    background: #123a27;
-
     color: white;
-
     font-weight: bold;
 }
-
 
 
 label {

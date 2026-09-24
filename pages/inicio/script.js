@@ -40,3 +40,16 @@ filtroTipo.addEventListener('change', atualizarEventos);
 ordenacao.addEventListener('change', atualizarEventos);
 
 atualizarEventos();
+
+const linkEntrar = document.getElementById('linkEntrar');
+const linkCadastro = document.getElementById('linkCadastro');
+const usuarioLogado = localStorage.getItem('seacNomeUsuario') || localStorage.getItem('seacUsuario');
+
+if (usuarioLogado) {
+    linkEntrar.textContent = `Olá, ${usuarioLogado}`;
+    linkEntrar.href = '#';
+    linkEntrar.addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+    linkCadastro.style.display = 'none';
+}
