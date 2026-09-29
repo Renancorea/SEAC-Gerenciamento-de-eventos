@@ -13,7 +13,7 @@ Conexao.connect((err) => {
     console.error('Erro:', err);
     return;
   }
-  consolelog('conectado ao bd seac');
+  console.log('conectado ao bd seac');
 });
 
 export default Conexao;
