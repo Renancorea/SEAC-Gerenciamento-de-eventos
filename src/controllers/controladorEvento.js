@@ -1,7 +1,7 @@
 import { filtrarEventos, pesquisarEventos, cadastrarEvento, deletarEvento, editarEvento, listarDetalhesEvento, listarEventos } from "../services/servicoEvento.js";
 
 
-export function cadastrarEvento(requisicao, resposta) {
+export function CadastrarEvento(requisicao, resposta) {
 
     try {
         
@@ -21,7 +21,7 @@ export function cadastrarEvento(requisicao, resposta) {
     }
 }
 
-export function listarEventos(requisicao, resposta) {
+export function ListarEventos(requisicao, resposta) {
 
     try {
 
@@ -41,7 +41,7 @@ export function listarEventos(requisicao, resposta) {
     }
 }
 
-export function listarDetalhesEvento(requisicao, resposta) {
+export function ListarDetalhesEventos(requisicao, resposta) {
 
     try {
         const id = Number(requisicao.params.id);
@@ -61,7 +61,7 @@ export function listarDetalhesEvento(requisicao, resposta) {
     }
 }
 
-export function editarEvento(requisicao, resposta) {
+export function EditarEvento(requisicao, resposta) {
 
     try {
 
@@ -81,7 +81,7 @@ export function editarEvento(requisicao, resposta) {
     }
 }
 
-export function deletarEvento(requisicao, resposta) {
+export function DeletarEvento(requisicao, resposta) {
 
     try {
 
@@ -100,7 +100,7 @@ export function deletarEvento(requisicao, resposta) {
     }
 }
 
-export function pesquisarEventos(requisicao, resposta) {
+export function PesquisarEventos(requisicao, resposta) {
 
     try {
 
@@ -121,7 +121,7 @@ export function pesquisarEventos(requisicao, resposta) {
     }
 }
 
-export function filtrarEventos(requisicao, resposta) {
+export function FiltrarEventos(requisicao, resposta) {
 
     try {
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { cadastrar } from "../controllers/controladorUsario.js";
+import { Cadastrar } from "../controllers/controladorUsario.js";
 
 const router = Router();
 
-router.post("/", cadastrar);
+router.post("/", Cadastrar);
 export default router;

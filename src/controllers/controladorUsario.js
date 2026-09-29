@@ -1,6 +1,6 @@
 import { cadastrar } from "../services/servicoUsuario.js";
 
-export function cadastrar(requisicao, resposta) {
+export function Cadastrar(requisicao, resposta) {
     try {
         const usuario = cadastrar(requisicao.body);
 

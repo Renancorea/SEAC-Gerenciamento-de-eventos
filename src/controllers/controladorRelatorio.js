@@ -1,6 +1,6 @@
 import { relatorioGeralUsuarios, relatorioGeralEventos, relatorioUsuariosEvento } from '../services/servicoRelatorio.js';
 
-export function relatorioGeralUsuarios(requisicao, resposta) {
+export function RelatorioGeralUsuarios(requisicao, resposta) {
 
     try {
 
@@ -20,7 +20,7 @@ export function relatorioGeralUsuarios(requisicao, resposta) {
     }
 }
 
-export function relatorioGeralEventos(requisicao, resposta) {
+export function RelatorioGeralEventos(requisicao, resposta) {
 
     try {
 
@@ -38,7 +38,7 @@ export function relatorioGeralEventos(requisicao, resposta) {
 
     }
 } 
-export function relatorioUsuariosEvento(requisicao, resposta) {
+export function RelatorioUsuariosEvento(requisicao, resposta) {
     
     try {
 

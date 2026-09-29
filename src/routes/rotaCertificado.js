@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { gerarCertificado } from "../controllers/controladorCertificado.js";
+import { GerarCertificado } from "../controllers/controladorCertificado.js";
 
 const router = Router();
 
-router.post("/", gerarCertificado);
+router.post("/", GerarCertificado);
 
 export default router;

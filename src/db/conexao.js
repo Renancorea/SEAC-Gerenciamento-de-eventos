@@ -1,19 +1,19 @@
-import conexao from 'mysql2';
+import { createConnection } from 'mysql2';
 
-const conexao = conexao.createConnection({
+const Conexao = createConnection({
   host: 'localhost',
   port: 3306,
-  user: 'root',
-  password: '',
+  user: 'renan',
+  password: 'Renan@1234',
   database: 'seac'
 });
 
-conexao.connect((err) => {
+Conexao.connect((err) => {
   if (err) {
     console.error('Erro:', err);
     return;
   }
-  console.log('conectado ao bd seac');
+  consolelog('conectado ao bd seac');
 });
 
-export default conexao;
+export default Conexao;

@@ -1,7 +1,7 @@
 import { gerarCertificado } from "../services/servicoCertificado.js";
 
 
-export async function gerarCertificado(requisicao, resposta) {
+export async function GerarCertificado(requisicao, resposta) {
 
     try {
 

@@ -1,7 +1,7 @@
 import { inscrever, registrarPresenca, listarInscritos, listarPresentes, verificarInscricao} from "../services/servicoInscricao.js";
 import { listarDetalhesEvento } from "../services/servicoEvento.js";
 
-export function realizarInscricao(requisicao, resposta) {
+export function RealizarInscricao(requisicao, resposta) {
 
     try {
 
@@ -28,7 +28,7 @@ export function realizarInscricao(requisicao, resposta) {
 }
 
 
-export function registrarPresenca(requisicao, resposta) {
+export function RegistrarPresenca(requisicao, resposta) {
 
     try {
 
@@ -53,7 +53,7 @@ export function registrarPresenca(requisicao, resposta) {
 
     }
 }
-export function vizualizarInscritos(requisicao, resposta) {
+export function VizualizarInscritos(requisicao, resposta) {
 
     try {
 
@@ -77,7 +77,7 @@ export function vizualizarInscritos(requisicao, resposta) {
     }
 }
 
-export function vizualizarPresentes(requisicao, resposta) {
+export function VizualizarPresentes(requisicao, resposta) {
 
     try {
 
@@ -96,7 +96,7 @@ export function vizualizarPresentes(requisicao, resposta) {
     }
 }
 
-export function verificarInscricaoUsuario(requisicao, resposta) {
+export function VerificarInscricaoUsuario(requisicao, resposta) {
 
     try {
 

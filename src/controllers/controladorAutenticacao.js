@@ -1,6 +1,6 @@
 import { login, logout} from "../services/servicoAutenticacao.js";
 
-export function login(requisicao, resposta) {
+export function Login(requisicao, resposta) {
     try {
         const usuario = login(requisicao.body);
 
@@ -16,7 +16,7 @@ export function login(requisicao, resposta) {
     }
 }
 
-export function logout(resposta) {
+export function Logout(resposta) {
     try {
         logout();
     

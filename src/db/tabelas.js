@@ -1,6 +1,11 @@
 class Tabelas{
     initialize(conexao){
         this.conexao = conexao;
+        this.criarTabelaUsuario();
+        this.criarTabelaEvento();
+        this.criarTabelaAcao();
+        this.criarTabelaInscricao();
+        this.criarTabelaCertificado();
     }
  
     criarTabelaUsuario(){
@@ -175,3 +180,5 @@ class Tabelas{
     }
 
 }
+
+export default new Tabelas();

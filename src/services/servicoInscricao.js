@@ -22,15 +22,6 @@ const participacoes = [
     }
 ];
 
-export function inscrever(usuarioId, eventoId) {
-
-    const existe = participacoes.find(
-        participacao =>
-            participacao.usuarioId === usuarioId &&
-            participacao.eventoId === eventoId
-    );
-    }
-
 export function inscrever(idUsuario, idEvento) {
 
     const existe = participacoes.find(

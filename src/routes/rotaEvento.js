@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { cadastrarEvento,listarEventos,listarDetalhesEventos,editarEvento,deletarEvento } from "../controllers/controladorEvento.js";
+import { CadastrarEvento,ListarEventos,ListarDetalhesEventos,EditarEvento,DeletarEvento } from "../controllers/controladorEvento.js";
 
 const router = Router();
 
-router.post("/", cadastrarEvento);
-router.get("/", listarEventos);
-router.get("/detalhes", listarDetalhesEventos);
-router.put("/editar/:id", editarEvento);
-router.delete("/deletar/:id", deletarEvento);
+router.post("/", CadastrarEvento);
+router.get("/", ListarEventos);
+router.get("/detalhes", ListarDetalhesEventos);
+router.put("/editar/:id", EditarEvento);
+router.delete("/deletar/:id", DeletarEvento);
 
 export default router;
