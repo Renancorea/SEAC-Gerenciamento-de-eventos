@@ -7,6 +7,6 @@ router.post("/inscricao", RealizarInscricao);
 router.put("/presenca", RegistrarPresenca);
 router.get("/eventos/:eventoId/inscritos", VizualizarInscritos);
 router.get("/eventos/:eventoId/presentes", VizualizarPresentes);
-router.get("/usuario/:userId/inscricao", VerificarInscricaoUsuario);
+router.get("/usuario/:usuarioId/inscricao", VerificarInscricaoUsuario);
 
 export default router;

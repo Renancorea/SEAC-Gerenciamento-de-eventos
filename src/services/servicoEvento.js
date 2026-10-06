@@ -1,61 +1,25 @@
-const eventos = [
-    {
-    id: 1,
-    nome: "IFCE vozes",
-    local: "Auditório Principal",
-    data: "2026-05-15",
-    horario: "13:00",
-    descricao: "Musicas e talentos",
-    tipo: "seinao",
-    assentos: 100,
-    categoria: "Cultural",
-    idOrganizador: 1,
-    cargaHoraria: 2
-    },
-    {
-    id: 2,
-    nome: "X(10°) evento cultural",
-    local: "Auditório Principal",
-    data: "2026-07-26",
-    horario: "08:00",
-    descricao: "Autismo e inclusão",
-    tipo: "Palestra",
-    assentos: 100,
-    categoria: "saude e cultura",
-    idOrganizador: 1,
-    cargaHoraria: 2
-    }
-];
-const usuarios = [
-    {
-    "nome": "Renan",
-    "matricula": "2024001",
-    "email": "renan@gmail.com",
-    "tipo": 1,
-    "senha": "123456"
-},
-{
-    "nome": "Ana",
-    "matricula": null,
-    "email": "ana@gmail.com",
-    "tipo": 0,
-    "siape": "1234567",
-    "senha": "123456"
-}
-];
-const organizadores = [
-    {
-    "id": 1,
-    "nome": "Ana",
-    "matricula": null,
-    "email": "ana@gmail.com",
-    "tipo": 0,
-    "siape": "1234567",
-    "senha": "123456"
-    }
-]
+import Conexao from "../db/conexao.js";
 
-export function cadastrarEvento(dados) {
+function executar(sql, valores) {
+
+    return new Promise((resolve, reject) => {
+
+        Conexao.execute(sql, valores, (err, resultado) => {
+
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(resultado);
+        });
+
+    });
+
+}
+
+export async function cadastrarEvento(dados) {
+
     const {
         nome,
         local,
@@ -69,165 +33,184 @@ export function cadastrarEvento(dados) {
         cargaHoraria
     } = dados;
 
-    // descrição opc
-    // na pratica podem confundir tipo com categoria
+
     if (!nome || !local || !data || !horario || !assentos) {
-            throw new Error(
-                "Todos esses campos devem ser preenchidos"
-            );
-        }
+        throw new Error(
+            "Todos esses campos devem ser preenchidos"
+        );
+    }
+
     if (assentos != null && (!Number.isInteger(assentos) || assentos <= 0)) {
         throw new Error(
             "O numero de assentos deve ser um natural maior que 0"
-        )
+        );
     }
     if (cargaHoraria != null && (!Number.isInteger(cargaHoraria) || cargaHoraria <= 0)) {
+
         throw new Error(
-            "A carga horaria deve ser um natural maior que 0"
-        )
-    }
-
-     const organizador = organizadores.find(
-        organizador => organizador.id === idOrganizador
-    );
-
-    if (!organizador) {
-        throw new Error("Organizador não encontrado");
-    }
-
-    const evento = {
-        id: eventos.length + 1,
-        nome,
-        local,
-        data,
-        horario,
-        descricao: descricao || "",
-        tipo: tipo || "",
-        assentos,
-        categoria: categoria || "",
-        idOrganizador,
-        cargaHoraria: cargaHoraria
-    };
-
-    eventos.push(evento);
-}
-export function listarEventos() {
-    return eventos.map(evento => ({
-        nome: evento.nome,
-        data: evento.data,
-        horario: evento.horario,
-        cargaHoraria: evento.cargaHoraria,
-        nomeOrganizador: organizadores.find(a => a.id === evento.idOrganizador)?.nome || "Desconhecido"
-    }));
-}
-
-export function listarDetalhesEvento(id) {
-    const evento = eventos.find(evento => evento.id === id);
-    if (!evento) {
-        throw new Error("Evento não encontrado");
-    }
-
-      const organizador = organizadores.find(
-        organizador => organizador.id === evento.idOrganizador
-    );
-
-    return{
-    ...evento,
-    nomeOrganizador: organizador?.nome || "Desconhecido"
-    };
-    // esses 3 pontos cria um novo objeto adicionando outro breguesse
-}
-
-export function deletarEvento(id, idOrganizador) {
-
-    const index = eventos.findIndex(evento => evento.id === id);
-    if (index === -1) {
-        throw new Error("Evento não encontrado");
-    }
-
-    const evento = eventos[index];
-    if (evento.idOrganizador !== idOrganizador) {
-        throw new Error(
-            "Você não pode remover este evento"
+           "A carga horaria deve ser um natural maior que 0"
         );
     }
 
-    eventos.splice(index, 1);
-}
-// findIndex retorna o index, se não acahr ele da  -1
 
-export function editarEvento(idEvento, idOrganizador, dados) {
+    const organizador = await executar(
+        "SELECT * FROM Usuario WHERE usuarioId = ?",
+        [idOrganizador]
+    );
 
-    const index = eventos.findIndex(evento => evento.id === idEvento);
+    const organizadorExiste = organizador.length > 0;
 
-    if (index === -1) {
-        throw new Error("Evento não encontrado");
-    }
 
-    const evento = eventos[index];
+    if (!organizadorExiste) {
 
-    if (evento.idOrganizador !== idOrganizador) {
         throw new Error(
-            "Você não pode editar este evento"
+            "Organizador não encontrado"
         );
+
     }
 
-    eventos[index] = {
-        id: idEvento,
-        nome: dados.nome,
-        local: dados.local,
-        data: dados.data,
-        horario: dados.horario,
-        descricao: dados.descricao || "",
-        tipo: dados.tipo || "",
-        assentos: dados.assentos,
-        categoria: dados.categoria || "",
-        idOrganizador: evento.idOrganizador,
-        cargaHoraria: dados.cargaHoraria || "",
-    };
+
+    await executar(
+        `INSERT INTO Evento
+        (nome, local, data, horario, descricao, tipo, assentos, categoria, idOrganizador, cargaHoraria)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+            nome,
+            local,
+            data,
+            horario,
+            descricao,
+            tipo,
+            assentos,
+            categoria,
+            idOrganizador,
+            cargaHoraria
+        ]
+    );
+
 }
 
-export function pesquisarEventos(pesquisa) {
+
+export async function listarEventos() {
+
+    const resultado = await executar(
+        `SELECT * FROM Evento`
+    );
+
+    return resultado;
+
+}
+
+
+export async function listarDetalhesEvento(idEvento, idOrganizador) {
+
+    const evento = await executar(
+        `SELECT * FROM Evento WHERE eventoId = ?`,
+        [idEvento]
+    );
+
+    const organizador = await executar(
+        `SELECT * FROM Usuario WHERE usuarioId = ?`,
+        [idOrganizador]
+    );
+
+    return {
+        evento,
+        organizador
+    };
+
+}
+
+
+export async function deletarEvento(id, idOrganizador) {
+
+    const resultado = await executar(
+        `DELETE FROM Evento
+         WHERE eventoId = ? AND idOrganizador = ?`,
+        [id, idOrganizador]
+    );
+
+    return resultado;
+
+}
+
+
+export async function editarEvento(idEvento, idOrganizador, dados) {
+
+    const resultado = await executar(
+        `UPDATE Evento
+         SET nome = ?,
+             local = ?,
+             data = ?,
+             horario = ?,
+             descricao = ?,
+             tipo = ?,
+             assentos = ?,
+             categoria = ?,
+             cargaHoraria = ?
+         WHERE eventoId = ? AND idOrganizador = ?`,
+        [
+            dados.nome,
+            dados.local,
+            dados.data,
+            dados.horario,
+            dados.descricao,
+            dados.tipo,
+            dados.assentos,
+            dados.categoria,
+            dados.cargaHoraria,
+            idEvento,
+            idOrganizador
+        ]
+    );
+
+    return resultado;
+
+}
+
+
+export async function pesquisarEventos(pesquisa) {
 
     pesquisa = pesquisa.toLowerCase();
 
-    const resultado = eventos.filter(evento => {
-
-        const nomeOrganizador = usuarios.find(a => a.id === evento.idOrganizador)?.nome.toLowerCase() || "Sem";
-        
-        return (
-            evento.nome.toLowerCase().includes(pesquisa) ||
-            nomeOrganizador.includes(pesquisa)
-        );
-    });
-
-    return resultado;
-}
-
-export function filtrarEventos(tipo, data, categoria, cargaHoraria) {
-
-    let resultado = eventos;
-
-      if (tipo) {
-        resultado = resultado.filter(
-            evento => evento.tipo === tipo
-        );
-    }
-
-    if (categoria) {
-        resultado = resultado.filter(
-            evento => evento.categoria === categoria
-        );
-    }
-    if (cargaHoraria) {
-        resultado = resultado.filter(
-            evento => evento.cargaHoraria === cargaHoraria
-        );
-    }
-
-    resultado.sort(
-        (a, b) => new Date(a.data) - new Date(b.data)
+    const resultado = await executar(
+        `SELECT * FROM Evento
+         WHERE LOWER(nome) LIKE ?
+         OR LOWER(local) LIKE ?
+         OR LOWER(descricao) LIKE ?`,
+        [
+            `%${pesquisa}%`,
+            `%${pesquisa}%`,
+            `%${pesquisa}%`
+        ]
     );
 
     return resultado;
-};
+
+}
+
+
+export async function filtrarEventos(
+    tipo,
+    data,
+    categoria,
+    cargaHoraria
+) {
+
+    const resultado = await executar(
+        `SELECT * FROM Evento
+         WHERE tipo = ?
+         OR data = ?
+         OR categoria = ?
+         OR cargaHoraria = ?`,
+        [
+            tipo,
+            data,
+            categoria,
+            cargaHoraria
+        ]
+    );
+
+    return resultado;
+
+}

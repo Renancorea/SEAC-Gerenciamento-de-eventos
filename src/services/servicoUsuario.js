@@ -1,25 +1,23 @@
-import bycrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
+import Conexao from "../db/conexao.js";
 
-const usuarios = [
-    {
-    "nome": "Renan",
-    "matricula": "2024001",
-    "email": "renan@gmail.com",
-    "tipo": 1,
-    "senha": "123456"
-},
-{
-    "nome": "Ana",
-    "matricula": null,
-    "email": "ana@gmail.com",
-    "tipo": 0,
-    "siape": "1234567",
-    "senha": "123456"
+function executar(sql, valores) {
+    return new Promise((resolve, reject) => {
+
+        Conexao.execute(sql, valores, (err, resultado) => {
+
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(resultado);
+        });
+
+    });
 }
-];
 
-
-export function cadastrar(dados) {
+export async function cadastrar(dados) {
 
     const {
         nome,
@@ -27,87 +25,84 @@ export function cadastrar(dados) {
         email,
         tipo,
         siape,
-        senha
+        senha,
+        adm
     } = dados;
+
     if (tipo === 0) {
 
-        if (!nome || !siape || !email || !tipo || !senha) {
-        throw new Error(
-            "Todos os campos devem ser preenchidos"
-        );
-    }
-       if (!siape) {
-        throw new Error(
-            "Está faltando o siape"
-        );
-    }
-    const siapeExiste = usuarios.some(
-        usuario => usuario.siape === siape
-    );
-
-    if (siapeExiste) {
-        throw new Error(
-            "Este siape já existe"
-        );
-    }
-
-    const emailExiste = usuarios.some(
-        usuario => usuario.email === email
-    );
-    // esse some é de someone, alguem em ingles kkkkkk.
-    if (emailExiste) {
-        throw new Error(
-            "Este email já existe"
-        );
-    }
-
-    }
-    else{
-
-        if (!nome || !matricula || !email || !tipo || !senha) {
+        if (!nome || !siape || !email || !senha) {
             throw new Error(
                 "Todos os campos devem ser preenchidos"
             );
         }
-        
-        
-        const matriculaExiste = usuarios.some(
-            usuario => usuario.matricula === matricula
+
+        const siapeResultado = await executar(
+            "SELECT * FROM Usuario WHERE siape = ?",
+            [siape]
         );
-        
-        if (matriculaExiste) {
+
+        const siapeExiste = siapeResultado.length > 0;
+
+        if (siapeExiste) {
             throw new Error(
-                "Esta matrícula já exidte"
+                "Este siape já existe"
             );
         }
-        
-    const emailExiste = usuarios.some(
-        usuario => usuario.email === email
+
+        const emailResultado = await executar(
+            "SELECT * FROM Usuario WHERE email = ?",
+            [email]
         );
-        // esse some é de someone, alguem em ingles kkkkkk.
+
+        const emailExiste = emailResultado.length > 0;
+
+        if (emailExiste) {
+            throw new Error(
+                "Este email já existe"
+            );
+        }
+    } else {
+
+        if (!nome || !matricula || !email || !senha) {
+            throw new Error(
+                "Todos os campos devem ser preenchidos"
+            );
+        }
+
+        const matriculaResultado = await executar(
+            "SELECT * FROM Usuario WHERE matricula = ?",
+            [matricula]
+        );
+
+        const matriculaExiste = matriculaResultado.length > 0;
+
+        if (matriculaExiste) {
+            throw new Error(
+                "Esta matrícula já existe"
+            );
+        }
+
+        const emailResultado = await executar(
+            "SELECT * FROM Usuario WHERE email = ?",
+            [email]
+        );
+
+        const emailExiste = emailResultado.length > 0;
+
         if (emailExiste) {
             throw new Error(
                 "Este email já existe"
             );
         }
     }
-        
-     const senhaHash = bcrypt.hash(senha, 10);
-    // Mt legal esse bcrypt, hash nem...
 
-    const usuario = {
-        id: usuarios.length + 1,
-        nome,
-        matricula: tipo === 1 ? matricula : null,
-        email,
-        tipo,
-        siape: tipo === 0 ? siape : null,
-        senha: senhaHash,
-        adm: false
-    };
+    const senhaHash = await bcrypt.hash(senha, 10);
 
-    usuarios.push(usuario);
-
-    return usuario;
-};
-
+    await executar(
+        `INSERT INTO Usuario
+        (nome, matricula, email, tipo, siape, senha, adm)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [nome, matricula, email, tipo, siape, senhaHash, adm]
+    );
+}

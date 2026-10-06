@@ -14,12 +14,12 @@ class Tabelas{
         usuarioId INT AUTO_INCREMENT PRIMARY KEY,
         nome VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
-        matricula VARCHAR(20) UNIQUE,
-        tipo TINYINT NOT NULL,
-        siape VARCHAR(20) UNIQUE,
-        senha VARCHAR(255) NOT NULL,
+        matricula INT(20) UNIQUE,
+        tipo int NOT NULL,
+        siape varchar(255) UNIQUE,
+        senha VARCHAR(20) NOT NULL,
         adm BOOLEAN NOT NULL DEFAULT FALSE
-        );
+    );
         `;
         this.conexao.query(sql, (erro) => {
             if(erro){
@@ -27,7 +27,6 @@ class Tabelas{
             } else {
                 console.log('Tabela Usuario criada com sucesso!');
             }
-            console.log("é pra ter criado")
         });
 
     }
@@ -45,10 +44,10 @@ class Tabelas{
         assentos INT,
         cargaHoraria DECIMAL(4,2),
 
-        usuarioId INT NOT NULL,
+        idOrganizador INT NOT NULL,
 
-        CONSTRAINT fk_evento_usuario
-            FOREIGN KEY (usuarioId)
+        CONSTRAINT fk_evento_organizador
+            FOREIGN KEY (idOrganizador)
             REFERENCES Usuario(usuarioId)
             ON UPDATE CASCADE
             ON DELETE RESTRICT
@@ -159,7 +158,6 @@ class Tabelas{
         imagemId INT AUTO_INCREMENT PRIMARY KEY,
         nomeImagem VARCHAR(255),
         caminho VARCHAR(500),
-        ordem INT,
         dataEnvio DATETIME DEFAULT CURRENT_TIMESTAMP,
         eventoId INT NOT NULL,
 

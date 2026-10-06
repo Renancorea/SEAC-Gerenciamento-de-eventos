@@ -24,6 +24,12 @@ app.use("/api/participacao", rotaInscricao);
 app.use("/api/certificados", rotaCertificado);
 app.use("/api/relatorios", rotaRelatorio);
 
+app.get("/", (requisicao, resposta) => {
+    resposta.json({
+        mensagem: "API do SEAC funcionando!"
+    });
+});
+
 const porta = 3000;
 
 app.listen(porta, () => {

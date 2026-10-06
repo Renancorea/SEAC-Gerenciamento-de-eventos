@@ -1,19 +1,25 @@
 import { cadastrar } from "../services/servicoUsuario.js";
 
-export function Cadastrar(requisicao, resposta) {
+export async function Cadastrar(requisicao, resposta) {
+
     try {
-        const usuario = cadastrar(requisicao.body);
+
+        const usuario = await cadastrar(requisicao.body);
 
         return resposta.status(201).json({
+
             mensagem: "Usuário cadastrado com sucesso",
-            usuario
+
         });
 
     } catch (erro) {
+
         return resposta.status(400).json({
-            mensagem: erro
+
+            mensagem: erro.message
+
         });
+
     }
+
 }
-
-

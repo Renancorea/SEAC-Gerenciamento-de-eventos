@@ -3,7 +3,7 @@ import { CadastrarEvento,ListarEventos,ListarDetalhesEventos,EditarEvento,Deleta
 
 const router = Router();
 
-router.post("/", CadastrarEvento);
+router.post("/cadastrar", CadastrarEvento);
 router.get("/", ListarEventos);
 router.get("/detalhes", ListarDetalhesEventos);
 router.put("/editar/:id", EditarEvento);
