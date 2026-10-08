@@ -1,122 +1,184 @@
-const participacoes = [
-    {
-        id: 1,
-        usuarioId: 1,
-        eventoId: 2,
-        inscrito: true,
-        presente: false
-    },
-    {
-        id: 2,
-        usuarioId: 2,
-        eventoId: 2,
-        inscrito: true,
-        presente: false
-    },
-    {
-        id: 3,
-        usuarioId: 3,
-        eventoId: 2,
-        inscrito: true,
-        presente: false
-    }
-];
+import Conexao from "../db/conexao.js";
 
-export function inscrever(idUsuario, idEvento) {
+function executar(sql, valores) {
 
-    const existe = participacoes.find(
-        participacao =>
-            participacao.usuarioId === idUsuario &&
-            participacao.eventoId === idEvento
+    return new Promise((resolve, reject) => {
+        Conexao.execute(sql, valores, (err, resultado) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(resultado);
+
+        });
+
+    });
+
+}
+
+
+export async function inscrever(idUsuario, idEvento) {
+
+    const participacao = await executar(
+        `SELECT * FROM Participacao
+         WHERE usuarioId = ? AND eventoId = ?`,
+        [idUsuario, idEvento]
     );
 
-    if (existe) {
+    if (participacao.length > 0) {
+
         throw new Error(
             "Usuário já está inscrito neste evento"
         );
+
     }
-
-    const participacao = {
-        id: participacoes.length + 1,
-        usuarioId,
-        eventoId,
-        inscrito: true,
-        presente: false
-    };
-
-    participacoes.push(participacao);
-
-    return participacao;
-}
-
-
-export function registrarPresenca(idUsuario, idEvento) {
-
-    const participacao = participacoes.find(
-        participacao =>
-            participacao.usuarioId === idUsuario &&
-            participacao.eventoId === idEvento
+    const evento = await executar(
+        `SELECT * FROM Evento
+         WHERE eventoId = ?`,
+        [idEvento]
+    );
+    if (evento.length === 0) {
+        throw new Error(
+            "Evento não encontrado"
+        );
+    }
+    const usuario = await executar(
+        `SELECT * FROM Usuario
+         WHERE usuarioId = ?`,
+        [idUsuario]
     );
 
-    if (!participacao) {
+    if (usuario.length === 0) {
+        throw new Error(
+            "Usuário não encontrado"
+        );
+    }
+    await executar(
+        `INSERT INTO Participacao
+         (usuarioId, eventoId, inscrito, presente)
+         VALUES (?, ?, ?, ?)`,
+        [idUsuario, idEvento, true, false]
+    );
+
+    return {
+        usuarioId: idUsuario,
+        eventoId: idEvento,
+        inscrito: true,
+        presente: false
+
+    };
+
+}
+
+export async function registrarPresenca(idUsuario, idEvento) {
+
+    const participacao = await executar(
+        `SELECT * FROM Participacao
+         WHERE usuarioId = ? AND eventoId = ?`,
+        [idUsuario, idEvento]
+    );
+    if (participacao.length === 0) {
         throw new Error(
             "Usuário não está inscrito neste evento"
         );
+
     }
 
-    participacao.presente = true;
 
-    return participacao;
-}
-
-// REVISAr esse negocio
-export function listarInscritos(idEvento, assentos) {
-
-    const inscritos = participacoes.filter(
-        participacao =>
-            participacao.eventoId === idEvento &&
-            participacao.inscrito === true
+    await executar(
+        `UPDATE Participacao
+         SET presente = ?
+         WHERE usuarioId = ? AND eventoId = ?`,
+        [true, idUsuario, idEvento]
     );
 
+
     return {
-        inscritos: inscritos.length,
+
+        usuarioId: idUsuario,
+
+        eventoId: idEvento,
+
+        inscrito: true,
+
+        presente: true
+
+    };
+
+}
+
+
+export async function listarInscritos(idEvento, assentos) {
+
+    const inscritos = await executar(
+        `SELECT * FROM Participacao
+         WHERE eventoId = ? AND inscrito = ?`,
+        [idEvento, true]
+    );
+
+
+    return {
+
+        quantidadeInscritos: inscritos.length,
+
         assentosDisponiveis: assentos - inscritos.length,
-        inscritos: participacoes
+
+        inscritos
+
     };
+
 }
 
 
-export function listarPresentes(idEvento) {
+export async function listarPresentes(idEvento) {
 
-    const presentes = participacoes.filter(
-        participacao =>
-            participacao.eventoId === idEvento &&
-            participacao.presente === true
+    const presentes = await executar(
+        `SELECT * FROM Participacao
+         WHERE eventoId = ? AND presente = ?`,
+        [idEvento, true]
     );
+
 
     return {
+
         quantidadePresentes: presentes.length,
+
         presentes
+
     };
+
 }
 
-export function verificarInscricao(idUsuario, idEvento) {
 
-    const participacao = participacoes.find(
-        participacao =>
-            participacao.usuarioId === idUsuario &&
-            participacao.eventoId === idEvento
+export async function verificarInscricao(idUsuario, idEvento) {
+
+    const participacao = await executar(
+        `SELECT * FROM Participacao
+         WHERE usuarioId = ? AND eventoId = ?`,
+        [idUsuario, idEvento]
     );
 
-    if (!participacao) {
+
+    if (participacao.length === 0) {
+
         return {
+
             inscrito: false,
+
             presente: false
+
         };
+
     }
 
+
     return {
-        inscrito: participacao.inscrito,
-        presente: participacao.presente
+
+        inscrito: participacao[0].inscrito,
+
+        presente: participacao[0].presente
+
     };
+
 }

@@ -1,43 +1,51 @@
-import bycrypt from "bcryptjs";
+export async function login(dados) {
 
-const usuarios = [
-    {
-    "nome": "Renan",
-    "matricula": "2024096",
-    "email": "renan@gmail.com",
-    "tipo": 1,
-    "senha": "123456"
-},
-{
-    "nome": "Ana",
-    "matricula": "2024034",
-    "email": "ana@gmail.com",
-    "tipo": 0,
-    "siape": "1234567",
-    "senha": "123456"
-}
-];
+    const {
+        identificador,
+        senha,
+        tipo
+    } = dados;
+    if (!identificador || !senha || tipo === undefined) {
 
-export function login(dados){
-    const { matricula, senha } = dados;
+        throw new Error(
+            "Identificador, senha e tipo devem ser preenchidos"
+        );
 
-    const usuario = usuarios.find(u => u.matricula === matricula);
-
-    if (!usuario) {
-        throw new Error("Matrícula ou senha incorretos");
     }
+    let resultado;
 
-    const senhaValida = bcrypt.compare(senha, usuario.senha);
+    if (tipo === 0) {
+        resultado = await executar(
+            `SELECT * FROM Usuario
+             WHERE siape = ?`,
+            [identificador]
+        );
+
+    } else {
+        resultado = await executar(
+            `SELECT * FROM Usuario
+             WHERE matricula = ?`,
+            [identificador]
+        );
+    }
+    if (resultado.length === 0) {
+
+        throw new Error(
+            "Matrícula/SIAPE ou senha incorretos"
+        );
+
+    }
+    const usuario = resultado[0];
+    const senhaValida = await bcrypt.compare(
+        senha,
+        usuario.senha
+    );
 
     if (!senhaValida) {
-        throw new Error("Matrícula ou senha incorretos");
+        throw new Error(
+            "Matrícula/SIAPE ou senha incorretos"
+        );
     }
-
     return usuario;
-}
 
-export function logout() {
-    usuarios = [];
 }
-// quando o sistema funcionar ele vai pegar os dados do banco e otar no array, quando der logout ele vai apagar os dados do array
-// quando tiver o banco de dados, o logout vai ser feito tanto no front quanto no back.
