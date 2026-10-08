@@ -1,42 +1,119 @@
 import puppeteer from "puppeteer";
+import Conexao from "../db/conexao.js";
 
-const certificados = [];
+
+function executar(sql, valores = []) {
+
+    return new Promise((resolve, reject) => {
+
+        Conexao.execute(sql, valores, (err, resultado) => {
+
+            if (err) {
+
+                reject(err);
+
+                return;
+
+            }
+
+            resolve(resultado);
+
+        });
+
+    });
+
+}
+
 
 export async function gerarCertificado(dados) {
 
     const {
-    nomeParticipante,
-    matricula,
-    nomeEvento,
-    dataEvento,
-    cargaHoraria
-} = dados;
+        usuarioId,
+        eventoId
+    } = dados;
 
-    if (!nomeParticipante || !matricula || !nomeEvento || !dataEvento) {
-    throw new Error(
-        "Nome, matrícula, nome do evento e data do evento são obrigatórios"
+
+    if (!usuarioId || !eventoId) {
+
+        throw new Error(
+            "Usuário e evento são obrigatórios"
+        );
+
+    }
+
+
+    const resultado = await executar(
+        `SELECT
+            u.nome AS nomeParticipante,
+            u.matricula,
+            u.siape,
+            e.nome AS nomeEvento,
+            e.data AS dataEvento,
+            e.cargaHoraria
+         FROM Usuario u
+         INNER JOIN Participacao p
+             ON u.usuarioId = p.usuarioId
+         INNER JOIN Evento e
+             ON p.eventoId = e.eventoId
+         WHERE u.usuarioId = ?
+         AND e.eventoId = ?
+         AND p.inscrito = ?
+         AND p.presente = ?`,
+        [
+            usuarioId,
+            eventoId,
+            true,
+            true
+        ]
     );
-}
 
-    const certificadoExistente = certificados.find(
-        certificado =>
-            certificado.nomeParticipante === nomeParticipante &&
-            certificado.nomeEvento === nomeEvento
+
+    if (resultado.length === 0) {
+
+        throw new Error(
+            "Usuário não está presente neste evento"
+        );
+
+    }
+
+    const dadosEvento = resultado[0];
+
+    const certificadoExistente = await executar(
+        `SELECT *
+         FROM Certificado
+         WHERE usuarioId = ?
+         AND eventoId = ?`,
+        [
+            usuarioId,
+            eventoId
+        ]
     );
 
-    if (certificadoExistente) {
+
+    if (certificadoExistente.length > 0) {
+
         throw new Error(
             "O certificado para este participante já foi emitido"
         );
+
     }
+
 
     const codigo = `SEAC-${Date.now()}`;
 
+
+    const matricula =
+        dadosEvento.matricula ||
+        dadosEvento.siape;
+
+
     const html = `
         <!DOCTYPE html>
+
         <html lang="pt-BR">
 
         <head>
+
             <meta charset="UTF-8">
 
             <style>
@@ -50,17 +127,13 @@ export async function gerarCertificado(dados) {
                 .certificado {
                     width: 100%;
                     height: 100vh;
-
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
-
                     text-align: center;
-
                     border: 10px solid #222;
                     box-sizing: border-box;
-
                     padding: 60px;
                 }
 
@@ -91,6 +164,7 @@ export async function gerarCertificado(dados) {
                 }
 
             </style>
+
         </head>
 
         <body>
@@ -100,33 +174,48 @@ export async function gerarCertificado(dados) {
                 <h1>CERTIFICADO</h1>
 
                 <div class="texto">
+
                     Certificamos que
+
                 </div>
 
                 <div class="nome">
-                    ${nomeParticipante}
+
+                    ${dadosEvento.nomeParticipante}
+
                 </div>
 
                 <div class="matricula">
-                    Matrícula: ${matricula}
+
+                    ${dadosEvento.matricula
+                        ? `Matrícula: ${matricula}`
+                        : `SIAPE: ${matricula}`}
+
                 </div>
 
                 <div class="texto">
+
                     participou do evento
-                    <strong>${nomeEvento}</strong>,
-                    realizado em ${dataEvento}.
+
+                    <strong>
+                        ${dadosEvento.nomeEvento}
+                    </strong>,
+
+                    realizado em ${dadosEvento.dataEvento}.
+
                 </div>
 
-                ${
-                    cargaHoraria
-                        ? `<div class="texto">
-                            Carga horária: ${cargaHoraria} horas.
-                        </div>`
-                        : ""
-                }
+                <div class="texto">
+
+                    Carga horária:
+                    ${dadosEvento.cargaHoraria} horas.
+
+                </div>
 
                 <div class="codigo">
+
                     Código de autenticidade: ${codigo}
+
                 </div>
 
             </div>
@@ -135,6 +224,7 @@ export async function gerarCertificado(dados) {
 
         </html>
     `;
+
 
     const browser = await puppeteer.launch();
 
@@ -146,33 +236,63 @@ export async function gerarCertificado(dados) {
             waitUntil: "networkidle0"
         });
 
+
         const caminho = `./certificados/${codigo}.pdf`;
 
+
         await page.pdf({
+
             path: caminho,
+
             format: "A4",
+
             landscape: true,
+
             printBackground: true
+
         });
 
-        const certificado = {
-            id: certificados.length + 1,
+
+        await executar(
+            `INSERT INTO Certificado
+             (cargaHoraria, arquivo, dataEmissao, usuarioId, eventoId)
+             VALUES (?, ?, ?, ?, ?)`,
+            [
+                dadosEvento.cargaHoraria,
+                caminho,
+                new Date(),
+                usuarioId,
+                eventoId
+            ]
+        );
+
+
+        return {
+
             codigo,
-            nomeParticipante,
-            matricula,
-            nomeEvento,
-            dataEvento,
-            cargaHoraria: cargaHoraria || null,
+
+            usuarioId,
+
+            eventoId,
+
+            nomeParticipante: dadosEvento.nomeParticipante,
+
+            matricula: matricula,
+
+            nomeEvento: dadosEvento.nomeEvento,
+
+            dataEvento: dadosEvento.dataEvento,
+
+            cargaHoraria: dadosEvento.cargaHoraria,
+
             caminho
+
         };
-
-        certificados.push(certificado);
-
-        return certificado;
 
     } finally {
 
         await browser.close();
 
     }
+
 }

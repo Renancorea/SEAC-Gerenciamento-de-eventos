@@ -1,86 +1,43 @@
-import { truncate } from "fs";
 import puppeteer from "puppeteer";
+import Conexao from "../db/conexao.js";
 
-const usuarios = [
-    {
-    "nome": "Renan",
-    "matricula": "2024001",
-    "email": "renan@gmail.com",
-    "tipo": 1,
-    "senha": "123456"
-},
-{
-    "nome": "Ana",
-    "matricula": null,
-    "email": "ana@gmail.com",
-    "tipo": 0,
-    "siape": "1234567",
-    "senha": "123456"
+
+function executar(sql, valores = []) {
+
+    return new Promise((resolve, reject) => {
+
+        Conexao.execute(sql, valores, (err, resultado) => {
+
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(resultado);
+
+        });
+
+    });
+
 }
-];
-
-const eventos = [
-    {
-    id: 1,
-    nome: "IFCE vozes",
-    local: "Auditório Principal",
-    data: "2026-05-15",
-    horario: "13:00",
-    descricao: "Musicas e talentos",
-    tipo: "seinao",
-    assentos: 100,
-    categoria: "Cultural",
-    cargaHoraria: "2h"
-    },
-    {
-    id: 2,
-    nome: "X(10°) evento cultural",
-    local: "Auditório Principal",
-    data: "2026-07-26",
-    horario: "08:00",
-    descricao: "Autismo e inclusão",
-    tipo: "Palestra",
-    assentos: 100,
-    categoria: "saude e cultura",
-    cargaHoraria: "3h"
-    }
-];
-
-const participacoes = [
-    {
-        id: 1,
-        usuarioId: 1,
-        eventoId: 2,
-        inscrito: true,
-        presente: false
-    },
-    {
-        id: 2,
-        usuarioId: 1,
-        eventoId: 3,
-        inscrito: true,
-        presente: true
-    },
-    {
-        id:3,
-        usuarioId: 1,
-        eventoId: 5,
-        inscrito: true,
-        presente: true
-    }
-];
 
 
 export async function relatorioGeralUsuarios() {
 
+    const usuarios = await executar(
+        `SELECT nome, matricula, siape
+         FROM Usuario`
+    );
+
     const codigo = `SEAC-${Date.now()}`;
 
     const pdfRelatorioGU = `
-    
         <!DOCTYPE html>
+
         <html lang="pt-BR">
 
         <head>
+
             <meta charset="UTF-8">
 
             <style>
@@ -94,17 +51,13 @@ export async function relatorioGeralUsuarios() {
                 .certificado {
                     width: 100%;
                     height: 100vh;
-
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
-
                     text-align: center;
-
                     border: 10px solid #222;
                     box-sizing: border-box;
-
                     padding: 60px;
                 }
 
@@ -118,44 +71,52 @@ export async function relatorioGeralUsuarios() {
                     line-height: 1.6;
                 }
 
-                .nome {
-                    font-size: 32px;
-                    font-weight: bold;
-                    margin: 30px 0 10px;
-                }
-
-                .matricula {
-                    font-size: 20px;
-                    margin-bottom: 30px;
-                }
-
                 .codigo {
                     margin-top: 50px;
                     font-size: 14px;
                 }
 
             </style>
+
         </head>
 
         <body>
 
             <div class="certificado">
 
-                <h1>Relatorio geral usuarios</h1>
+                <h1>Relatório geral usuários</h1>
+
                 <div class="texto">
-                    <p>Usuarios cadastrados: ${usuarios.length}</p>
-                    <p>Nome e matricula dos usuarios:</p>
+
+                    <p>
+                        Usuários cadastrados: ${usuarios.length}
+                    </p>
+
+                    <p>
+                        Nome e matrícula dos usuários:
+                    </p>
+
                     <ul>
+
                         ${usuarios.map(usuario => `
+
                             <li>
-                                ${usuario.nome} - ${usuario.matricula || usuario.siape + " (siape)"}
+
+                                ${usuario.nome} -
+                                ${usuario.matricula || usuario.siape + " (SIAPE)"}
+
                             </li>
-                        `).join('')}
+
+                        `).join("")}
+
                     </ul>
+
                 </div>
 
                 <div class="codigo">
+
                     Código de autenticidade: ${codigo}
+
                 </div>
 
             </div>
@@ -164,7 +125,7 @@ export async function relatorioGeralUsuarios() {
 
         </html>
     `;
-        
+
 
     const browser = await puppeteer.launch();
 
@@ -175,30 +136,44 @@ export async function relatorioGeralUsuarios() {
         await page.setContent(pdfRelatorioGU, {
             waitUntil: "networkidle0"
         });
-        // GU gerel usuarioa
+
         const relatorio = await page.pdf({
+
             format: "A4",
+
             landscape: true,
+
             printBackground: true
+
         });
 
         return relatorio;
 
     } finally {
+
         await browser.close();
+
     }
+
 }
 
+
 export async function relatorioGeralEventos() {
+
+    const eventos = await executar(
+        `SELECT nome, categoria, cargaHoraria
+         FROM Evento`
+    );
 
     const codigo = `SEAC-${Date.now()}`;
 
     const pdfRelatorioGE = `
-    
         <!DOCTYPE html>
+
         <html lang="pt-BR">
 
         <head>
+
             <meta charset="UTF-8">
 
             <style>
@@ -212,17 +187,13 @@ export async function relatorioGeralEventos() {
                 .certificado {
                     width: 100%;
                     height: 100vh;
-
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
-
                     text-align: center;
-
                     border: 10px solid #222;
                     box-sizing: border-box;
-
                     padding: 60px;
                 }
 
@@ -236,44 +207,53 @@ export async function relatorioGeralEventos() {
                     line-height: 1.6;
                 }
 
-                .nome {
-                    font-size: 32px;
-                    font-weight: bold;
-                    margin: 30px 0 10px;
-                }
-
-                .matricula {
-                    font-size: 20px;
-                    margin-bottom: 30px;
-                }
-
                 .codigo {
                     margin-top: 50px;
                     font-size: 14px;
                 }
 
             </style>
+
         </head>
 
         <body>
 
             <div class="certificado">
 
-                <h1>Relatorio geral eventos</h1>
+                <h1>Relatório geral eventos</h1>
+
                 <div class="texto">
-                    <p>Eventos cadastrados: ${eventos.length}</p>
-                    <p>Nome, descricao, carga horaria dos eventos:</p>
+
+                    <p>
+                        Eventos cadastrados: ${eventos.length}
+                    </p>
+
+                    <p>
+                        Nome, categoria e carga horária dos eventos:
+                    </p>
+
                     <ul>
+
                         ${eventos.map(evento => `
+
                             <li>
-                                ${evento.nome} - ${evento.categoria} - ${evento.cargaHoraria}
+
+                                ${evento.nome} -
+                                ${evento.categoria} -
+                                ${evento.cargaHoraria}
+
                             </li>
-                        `).join('')}
+
+                        `).join("")}
+
                     </ul>
+
                 </div>
 
                 <div class="codigo">
+
                     Código de autenticidade: ${codigo}
+
                 </div>
 
             </div>
@@ -282,7 +262,7 @@ export async function relatorioGeralEventos() {
 
         </html>
     `;
-        
+
 
     const browser = await puppeteer.launch();
 
@@ -293,30 +273,61 @@ export async function relatorioGeralEventos() {
         await page.setContent(pdfRelatorioGE, {
             waitUntil: "networkidle0"
         });
-        // GE gerel eventos
+
         const relatorio = await page.pdf({
+
             format: "A4",
+
             landscape: true,
+
             printBackground: true
+
         });
 
         return relatorio;
 
     } finally {
+
         await browser.close();
+
     }
+
 }
 
+
 export async function relatorioUsuariosEvento(idEvento) {
+
+    const participacoes = await executar(
+        `SELECT usuarioId
+         FROM Participacao
+         WHERE eventoId = ? AND inscrito = ?`,
+        [idEvento, true]
+    );
+
+
+    const usuarios = await executar(
+        `SELECT DISTINCT
+            u.nome,
+            u.matricula,
+            u.siape
+         FROM Usuario u
+         INNER JOIN Participacao p
+             ON u.usuarioId = p.usuarioId
+         WHERE p.eventoId = ?
+         AND p.inscrito = ?`,
+        [idEvento, true]
+    );
+
 
     const codigo = `SEAC-${Date.now()}`;
 
     const pdfRelatorioUE = `
-    
         <!DOCTYPE html>
+
         <html lang="pt-BR">
 
         <head>
+
             <meta charset="UTF-8">
 
             <style>
@@ -330,17 +341,13 @@ export async function relatorioUsuariosEvento(idEvento) {
                 .certificado {
                     width: 100%;
                     height: 100vh;
-
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
-
                     text-align: center;
-
                     border: 10px solid #222;
                     box-sizing: border-box;
-
                     padding: 60px;
                 }
 
@@ -354,44 +361,53 @@ export async function relatorioUsuariosEvento(idEvento) {
                     line-height: 1.6;
                 }
 
-                .nome {
-                    font-size: 32px;
-                    font-weight: bold;
-                    margin: 30px 0 10px;
-                }
-
-                .matricula {
-                    font-size: 20px;
-                    margin-bottom: 30px;
-                }
-
                 .codigo {
                     margin-top: 50px;
                     font-size: 14px;
                 }
 
             </style>
+
         </head>
 
         <body>
 
             <div class="certificado">
 
-                <h1>Relatorio usuarios em um evento</h1>
+                <h1>Relatório usuários em um evento</h1>
+
                 <div class="texto">
-                    <p>Usuarios cadastrados no evento: ${participacoes.filter(a => a.eventoId === idEvento).length}</p>
-                    <p>Nome e matricula dos usuarios:</p>
+
+                    <p>
+                        Usuários cadastrados no evento:
+                        ${participacoes.length}
+                    </p>
+
+                    <p>
+                        Nome e matrícula dos usuários:
+                    </p>
+
                     <ul>
+
                         ${usuarios.map(usuario => `
+
                             <li>
-                                ${usuario.nome} - ${usuario.matricula || usuario.siape + " (siape)"}
+
+                                ${usuario.nome} -
+                                ${usuario.matricula || usuario.siape + " (SIAPE)"}
+
                             </li>
-                        `).join('')}
+
+                        `).join("")}
+
                     </ul>
+
                 </div>
 
                 <div class="codigo">
+
                     Código de autenticidade: ${codigo}
+
                 </div>
 
             </div>
@@ -400,7 +416,7 @@ export async function relatorioUsuariosEvento(idEvento) {
 
         </html>
     `;
-        
+
 
     const browser = await puppeteer.launch();
 
@@ -411,16 +427,23 @@ export async function relatorioUsuariosEvento(idEvento) {
         await page.setContent(pdfRelatorioUE, {
             waitUntil: "networkidle0"
         });
-        // GU gerel usuarioa
+
         const relatorio = await page.pdf({
+
             format: "A4",
+
             landscape: true,
+
             printBackground: true
+
         });
 
         return relatorio;
 
     } finally {
+
         await browser.close();
+
     }
+
 }
