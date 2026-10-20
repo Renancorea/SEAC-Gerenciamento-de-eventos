@@ -1,24 +1,7 @@
 import bcrypt from "bcryptjs";
-import Conexao from "../db/conexao.js";
-
-function executar(sql, valores) {
-    return new Promise((resolve, reject) => {
-
-        Conexao.execute(sql, valores, (err, resultado) => {
-
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            resolve(resultado);
-        });
-
-    });
-}
+import { executar } from "../db/conexao.js";
 
 export async function cadastrar(dados) {
-
     const {
         nome,
         matricula,
@@ -29,80 +12,86 @@ export async function cadastrar(dados) {
         adm
     } = dados;
 
-    if (tipo === 0) {
+    const tipoNumerico = Number(tipo);
 
-        if (!nome || !siape || !email || !senha) {
-            throw new Error(
-                "Todos os campos devem ser preenchidos"
-            );
+    if (tipo === undefined || (tipoNumerico !== 0 && tipoNumerico !== 1)) {
+        throw new Error("Tipo de usuário inválido. Informe 0 para Organizador ou 1 para Participante.");
+    }
+
+    if (!email || !senha || !nome) {
+        throw new Error("Nome, e-mail e senha são obrigatórios.");
+    }
+
+    // Validação de e-mail duplicado comum a todos os usuários
+    const emailResultado = await executar(
+        "SELECT usuarioId FROM Usuario WHERE email = ?",
+        [email.trim().toLowerCase()]
+    );
+
+    if (emailResultado.length > 0) {
+        throw new Error("Este e-mail já está cadastrado.");
+    }
+
+    let matriculaFinal = null;
+    let siapeFinal = null;
+    let admFinal = false;
+
+    if (tipoNumerico === 0) {
+        // Organizador
+        if (!siape || String(siape).trim() === "") {
+            throw new Error("SIAPE é obrigatório para organizadores.");
         }
+
+        siapeFinal = String(siape).trim();
 
         const siapeResultado = await executar(
-            "SELECT * FROM Usuario WHERE siape = ?",
-            [siape]
+            "SELECT usuarioId FROM Usuario WHERE siape = ?",
+            [siapeFinal]
         );
 
-        const siapeExiste = siapeResultado.length > 0;
-
-        if (siapeExiste) {
-            throw new Error(
-                "Este siape já existe"
-            );
+        if (siapeResultado.length > 0) {
+            throw new Error("Este SIAPE já está cadastrado.");
         }
 
-        const emailResultado = await executar(
-            "SELECT * FROM Usuario WHERE email = ?",
-            [email]
-        );
-
-        const emailExiste = emailResultado.length > 0;
-
-        if (emailExiste) {
-            throw new Error(
-                "Este email já existe"
-            );
-        }
+        // Organizador pode ser administrador (adm booleano)
+        admFinal = Boolean(adm);
     } else {
-
-        if (!nome || !matricula || !email || !senha) {
-            throw new Error(
-                "Todos os campos devem ser preenchidos"
-            );
+        // Participante
+        if (!matricula || String(matricula).trim() === "") {
+            throw new Error("Matrícula é obrigatória para participantes.");
         }
+
+        matriculaFinal = String(matricula).trim();
 
         const matriculaResultado = await executar(
-            "SELECT * FROM Usuario WHERE matricula = ?",
-            [matricula]
+            "SELECT usuarioId FROM Usuario WHERE matricula = ?",
+            [matriculaFinal]
         );
 
-        const matriculaExiste = matriculaResultado.length > 0;
-
-        if (matriculaExiste) {
-            throw new Error(
-                "Esta matrícula já existe"
-            );
+        if (matriculaResultado.length > 0) {
+            throw new Error("Esta matrícula já está cadastrada.");
         }
 
-        const emailResultado = await executar(
-            "SELECT * FROM Usuario WHERE email = ?",
-            [email]
-        );
-
-        const emailExiste = emailResultado.length > 0;
-
-        if (emailExiste) {
-            throw new Error(
-                "Este email já existe"
-            );
-        }
+        // Participante NUNCA pode ser administrador ou organizador
+        admFinal = false;
     }
 
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    await executar(
+    const resultadoInsert = await executar(
         `INSERT INTO Usuario
         (nome, matricula, email, tipo, siape, senha, adm)
         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [nome, matricula, email, tipo, siape, senhaHash, adm]
+        [nome.trim(), matriculaFinal, email.trim().toLowerCase(), tipoNumerico, siapeFinal, senhaHash, admFinal ? 1 : 0]
     );
+
+    return {
+        usuarioId: resultadoInsert.insertId,
+        nome: nome.trim(),
+        email: email.trim().toLowerCase(),
+        tipo: tipoNumerico,
+        matricula: matriculaFinal,
+        siape: siapeFinal,
+        adm: admFinal
+    };
 }

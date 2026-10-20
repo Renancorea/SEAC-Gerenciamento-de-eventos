@@ -4,8 +4,11 @@
   "description": "Sistema de gerenciamento de eventos cientificos e acadêmicos do IFCE.",
   "main": "src/servidor.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "init": "node src/servidor.js"
+    "dev": "node src/servidor.js",
+    "start": "node src/servidor.js",
+    "build": "echo 'Build complete'",
+    "init": "node src/servidor.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -20,11 +23,9 @@
   },
   "homepage": "https://github.com/Renancorea/SEC-Gerenciamento-de-eventos#readme",
   "dependencies": {
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
-    "mysql": "^2.18.1",
-    "mysql2": "^3.24.4",
-    "puppeteer": "^25.9.0"
+    "mysql2": "^3.24.6",
+    "puppeteer": "^25.14.0"
   }
 }

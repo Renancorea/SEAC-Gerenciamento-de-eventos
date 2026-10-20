@@ -1,449 +1,285 @@
+import fs from "fs";
+import path from "path";
 import puppeteer from "puppeteer";
-import Conexao from "../db/conexao.js";
+import { executar } from "../db/conexao.js";
 
+async function gerarPdfRelatorio(html, nomeArquivo) {
+    const pastaRelatorios = path.resolve("./relatorios");
+    if (!fs.existsSync(pastaRelatorios)) {
+        fs.mkdirSync(pastaRelatorios, { recursive: true });
+    }
 
-function executar(sql, valores = []) {
+    let caminho = path.join(pastaRelatorios, `${nomeArquivo}.pdf`);
+    let formato = "pdf";
 
-    return new Promise((resolve, reject) => {
-
-        Conexao.execute(sql, valores, (err, resultado) => {
-
-            if (err) {
-                reject(err);
-                return;
+    try {
+        const gerarPdf = async () => {
+            const browser = await puppeteer.launch({
+                headless: true,
+                args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
+            });
+            try {
+                const page = await browser.newPage();
+                await page.setContent(html, { waitUntil: "networkidle0" });
+                await page.pdf({
+                    path: caminho,
+                    format: "A4",
+                    landscape: true,
+                    printBackground: true
+                });
+            } finally {
+                await browser.close();
             }
+        };
 
-            resolve(resultado);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Timeout ao inicializar Chromium do Puppeteer")), 2000)
+        );
 
-        });
+        await Promise.race([gerarPdf(), timeoutPromise]);
+    } catch (erro) {
+        console.warn("[SEAC] Puppeteer indisponível para relatório. Salvando em HTML:", erro.message);
+        caminho = path.join(pastaRelatorios, `${nomeArquivo}.html`);
+        formato = "html";
+        fs.writeFileSync(caminho, html, "utf-8");
+    }
 
-    });
-
+    return { caminho, formato };
 }
-
 
 export async function relatorioGeralUsuarios() {
-
     const usuarios = await executar(
-        `SELECT nome, matricula, siape
-         FROM Usuario`
+        `SELECT usuarioId, nome, matricula, siape, email, tipo
+         FROM Usuario
+         ORDER BY nome ASC`
     );
 
-    const codigo = `SEAC-${Date.now()}`;
+    const codigo = `SEAC-RGU-${Date.now()}`;
 
-    const pdfRelatorioGU = `
+    const html = `
         <!DOCTYPE html>
-
         <html lang="pt-BR">
-
         <head>
-
             <meta charset="UTF-8">
-
+            <title>Relatório Geral de Usuários</title>
             <style>
-
-                body {
-                    margin: 0;
-                    padding: 0;
-                    font-family: Arial, sans-serif;
-                }
-
-                .certificado {
-                    width: 100%;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    text-align: center;
-                    border: 10px solid #222;
-                    box-sizing: border-box;
-                    padding: 60px;
-                }
-
-                h1 {
-                    font-size: 42px;
-                    margin-bottom: 40px;
-                }
-
-                .texto {
-                    font-size: 22px;
-                    line-height: 1.6;
-                }
-
-                .codigo {
-                    margin-top: 50px;
-                    font-size: 14px;
-                }
-
+                body { margin: 0; padding: 40px; font-family: Arial, sans-serif; background: #fff; color: #1e293b; }
+                .relatorio { max-width: 900px; margin: auto; border: 2px solid #0f766e; padding: 30px; }
+                h1 { color: #0f766e; font-size: 24px; border-bottom: 2px solid #0f766e; padding-bottom: 8px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+                th { background-color: #f1f5f9; color: #0f766e; }
+                .codigo { margin-top: 30px; font-size: 12px; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
             </style>
-
         </head>
-
         <body>
-
-            <div class="certificado">
-
-                <h1>Relatório geral usuários</h1>
-
-                <div class="texto">
-
-                    <p>
-                        Usuários cadastrados: ${usuarios.length}
-                    </p>
-
-                    <p>
-                        Nome e matrícula dos usuários:
-                    </p>
-
-                    <ul>
-
-                        ${usuarios.map(usuario => `
-
-                            <li>
-
-                                ${usuario.nome} -
-                                ${usuario.matricula || usuario.siape + " (SIAPE)"}
-
-                            </li>
-
+            <div class="relatorio">
+                <h1>SEAC — Relatório Geral de Usuários</h1>
+                <p><strong>Total de usuários cadastrados:</strong> ${usuarios.length}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Perfil</th>
+                            <th>Identificação</th>
+                            <th>E-mail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${usuarios.map(u => `
+                            <tr>
+                                <td>${u.usuarioId}</td>
+                                <td>${u.nome}</td>
+                                <td>${Number(u.tipo) === 0 ? "Organizador" : "Participante"}</td>
+                                <td>${u.matricula ? `Matrícula: ${u.matricula}` : `SIAPE: ${u.siape}`}</td>
+                                <td>${u.email}</td>
+                            </tr>
                         `).join("")}
-
-                    </ul>
-
-                </div>
-
-                <div class="codigo">
-
-                    Código de autenticidade: ${codigo}
-
-                </div>
-
+                    </tbody>
+                </table>
+                <div class="codigo">Código de autenticidade: <strong>${codigo}</strong></div>
             </div>
-
         </body>
-
         </html>
     `;
 
+    const arquivoInfo = await gerarPdfRelatorio(html, codigo);
 
-    const browser = await puppeteer.launch();
-
-    try {
-
-        const page = await browser.newPage();
-
-        await page.setContent(pdfRelatorioGU, {
-            waitUntil: "networkidle0"
-        });
-
-        const relatorio = await page.pdf({
-
-            format: "A4",
-
-            landscape: true,
-
-            printBackground: true
-
-        });
-
-        return relatorio;
-
-    } finally {
-
-        await browser.close();
-
-    }
-
+    return {
+        codigo,
+        totalUsuarios: usuarios.length,
+        usuarios: usuarios.map(u => ({
+            usuarioId: u.usuarioId,
+            nome: u.nome,
+            tipo: Number(u.tipo) === 0 ? "Organizador" : "Participante",
+            identificacao: u.matricula || u.siape,
+            email: u.email
+        })),
+        arquivo: arquivoInfo.caminho,
+        formato: arquivoInfo.formato
+    };
 }
-
 
 export async function relatorioGeralEventos() {
-
     const eventos = await executar(
-        `SELECT nome, categoria, cargaHoraria
-         FROM Evento`
+        `SELECT eventoId, nome, local, data, horario, tipo, categoria, assentos, cargaHoraria
+         FROM Evento
+         ORDER BY data ASC`
     );
 
-    const codigo = `SEAC-${Date.now()}`;
+    const codigo = `SEAC-RGE-${Date.now()}`;
 
-    const pdfRelatorioGE = `
+    const html = `
         <!DOCTYPE html>
-
         <html lang="pt-BR">
-
         <head>
-
             <meta charset="UTF-8">
-
+            <title>Relatório Geral de Eventos</title>
             <style>
-
-                body {
-                    margin: 0;
-                    padding: 0;
-                    font-family: Arial, sans-serif;
-                }
-
-                .certificado {
-                    width: 100%;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    text-align: center;
-                    border: 10px solid #222;
-                    box-sizing: border-box;
-                    padding: 60px;
-                }
-
-                h1 {
-                    font-size: 42px;
-                    margin-bottom: 40px;
-                }
-
-                .texto {
-                    font-size: 22px;
-                    line-height: 1.6;
-                }
-
-                .codigo {
-                    margin-top: 50px;
-                    font-size: 14px;
-                }
-
+                body { margin: 0; padding: 40px; font-family: Arial, sans-serif; background: #fff; color: #1e293b; }
+                .relatorio { max-width: 900px; margin: auto; border: 2px solid #0f766e; padding: 30px; }
+                h1 { color: #0f766e; font-size: 24px; border-bottom: 2px solid #0f766e; padding-bottom: 8px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+                th { background-color: #f1f5f9; color: #0f766e; }
+                .codigo { margin-top: 30px; font-size: 12px; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
             </style>
-
         </head>
-
         <body>
-
-            <div class="certificado">
-
-                <h1>Relatório geral eventos</h1>
-
-                <div class="texto">
-
-                    <p>
-                        Eventos cadastrados: ${eventos.length}
-                    </p>
-
-                    <p>
-                        Nome, categoria e carga horária dos eventos:
-                    </p>
-
-                    <ul>
-
-                        ${eventos.map(evento => `
-
-                            <li>
-
-                                ${evento.nome} -
-                                ${evento.categoria} -
-                                ${evento.cargaHoraria}
-
-                            </li>
-
+            <div class="relatorio">
+                <h1>SEAC — Relatório Geral de Eventos</h1>
+                <p><strong>Total de eventos cadastrados:</strong> ${eventos.length}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome do Evento</th>
+                            <th>Tipo / Categoria</th>
+                            <th>Data</th>
+                            <th>Local</th>
+                            <th>Vagas</th>
+                            <th>Carga Horária</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${eventos.map(e => `
+                            <tr>
+                                <td>${e.eventoId}</td>
+                                <td>${e.nome}</td>
+                                <td>${e.tipo || ""} / ${e.categoria || ""}</td>
+                                <td>${e.data} ${e.horario}</td>
+                                <td>${e.local}</td>
+                                <td>${e.assentos}</td>
+                                <td>${e.cargaHoraria}h</td>
+                            </tr>
                         `).join("")}
-
-                    </ul>
-
-                </div>
-
-                <div class="codigo">
-
-                    Código de autenticidade: ${codigo}
-
-                </div>
-
+                    </tbody>
+                </table>
+                <div class="codigo">Código de autenticidade: <strong>${codigo}</strong></div>
             </div>
-
         </body>
-
         </html>
     `;
 
+    const arquivoInfo = await gerarPdfRelatorio(html, codigo);
 
-    const browser = await puppeteer.launch();
-
-    try {
-
-        const page = await browser.newPage();
-
-        await page.setContent(pdfRelatorioGE, {
-            waitUntil: "networkidle0"
-        });
-
-        const relatorio = await page.pdf({
-
-            format: "A4",
-
-            landscape: true,
-
-            printBackground: true
-
-        });
-
-        return relatorio;
-
-    } finally {
-
-        await browser.close();
-
-    }
-
+    return {
+        codigo,
+        totalEventos: eventos.length,
+        eventos,
+        arquivo: arquivoInfo.caminho,
+        formato: arquivoInfo.formato
+    };
 }
 
-
 export async function relatorioUsuariosEvento(idEvento) {
+    if (!idEvento) {
+        throw new Error("Identificador do evento não informado.");
+    }
 
-    const participacoes = await executar(
-        `SELECT usuarioId
-         FROM Participacao
-         WHERE eventoId = ? AND inscrito = ?`,
-        [idEvento, true]
+    const eid = Number(idEvento);
+
+    const eventoResultado = await executar(
+        `SELECT eventoId, nome, data, local FROM Evento WHERE eventoId = ?`,
+        [eid]
     );
 
+    if (eventoResultado.length === 0) {
+        throw new Error("Evento não encontrado.");
+    }
 
-    const usuarios = await executar(
-        `SELECT DISTINCT
-            u.nome,
-            u.matricula,
-            u.siape
+    const evento = eventoResultado[0];
+
+    // Busca de inscritos no evento usando a tabela oficial Inscricao
+    const inscritos = await executar(
+        `SELECT u.usuarioId, u.nome, u.matricula, u.siape, u.email,
+                i.presente, i.dataInscricao
          FROM Usuario u
-         INNER JOIN Participacao p
-             ON u.usuarioId = p.usuarioId
-         WHERE p.eventoId = ?
-         AND p.inscrito = ?`,
-        [idEvento, true]
+         INNER JOIN Inscricao i ON u.usuarioId = i.usuarioId
+         WHERE i.eventoId = ?
+         ORDER BY u.nome ASC`,
+        [eid]
     );
 
+    const codigo = `SEAC-RUE-${Date.now()}`;
 
-    const codigo = `SEAC-${Date.now()}`;
-
-    const pdfRelatorioUE = `
+    const html = `
         <!DOCTYPE html>
-
         <html lang="pt-BR">
-
         <head>
-
             <meta charset="UTF-8">
-
+            <title>Relatório de Usuários do Evento</title>
             <style>
-
-                body {
-                    margin: 0;
-                    padding: 0;
-                    font-family: Arial, sans-serif;
-                }
-
-                .certificado {
-                    width: 100%;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    text-align: center;
-                    border: 10px solid #222;
-                    box-sizing: border-box;
-                    padding: 60px;
-                }
-
-                h1 {
-                    font-size: 42px;
-                    margin-bottom: 40px;
-                }
-
-                .texto {
-                    font-size: 22px;
-                    line-height: 1.6;
-                }
-
-                .codigo {
-                    margin-top: 50px;
-                    font-size: 14px;
-                }
-
+                body { margin: 0; padding: 40px; font-family: Arial, sans-serif; background: #fff; color: #1e293b; }
+                .relatorio { max-width: 900px; margin: auto; border: 2px solid #0f766e; padding: 30px; }
+                h1 { color: #0f766e; font-size: 24px; border-bottom: 2px solid #0f766e; padding-bottom: 8px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+                th { background-color: #f1f5f9; color: #0f766e; }
+                .codigo { margin-top: 30px; font-size: 12px; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
             </style>
-
         </head>
-
         <body>
-
-            <div class="certificado">
-
-                <h1>Relatório usuários em um evento</h1>
-
-                <div class="texto">
-
-                    <p>
-                        Usuários cadastrados no evento:
-                        ${participacoes.length}
-                    </p>
-
-                    <p>
-                        Nome e matrícula dos usuários:
-                    </p>
-
-                    <ul>
-
-                        ${usuarios.map(usuario => `
-
-                            <li>
-
-                                ${usuario.nome} -
-                                ${usuario.matricula || usuario.siape + " (SIAPE)"}
-
-                            </li>
-
+            <div class="relatorio">
+                <h1>SEAC — Relatório de Participantes do Evento</h1>
+                <p><strong>Evento:</strong> ${evento.nome} | <strong>Data:</strong> ${evento.data} | <strong>Local:</strong> ${evento.local}</p>
+                <p><strong>Total de inscritos:</strong> ${inscritos.length}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Identificação</th>
+                            <th>E-mail</th>
+                            <th>Presença Confirmada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${inscritos.map(u => `
+                            <tr>
+                                <td>${u.nome}</td>
+                                <td>${u.matricula ? `Matrícula: ${u.matricula}` : `SIAPE: ${u.siape}`}</td>
+                                <td>${u.email}</td>
+                                <td>${u.presente ? "Sim" : "Não"}</td>
+                            </tr>
                         `).join("")}
-
-                    </ul>
-
-                </div>
-
-                <div class="codigo">
-
-                    Código de autenticidade: ${codigo}
-
-                </div>
-
+                    </tbody>
+                </table>
+                <div class="codigo">Código de autenticidade: <strong>${codigo}</strong></div>
             </div>
-
         </body>
-
         </html>
     `;
 
+    const arquivoInfo = await gerarPdfRelatorio(html, codigo);
 
-    const browser = await puppeteer.launch();
-
-    try {
-
-        const page = await browser.newPage();
-
-        await page.setContent(pdfRelatorioUE, {
-            waitUntil: "networkidle0"
-        });
-
-        const relatorio = await page.pdf({
-
-            format: "A4",
-
-            landscape: true,
-
-            printBackground: true
-
-        });
-
-        return relatorio;
-
-    } finally {
-
-        await browser.close();
-
-    }
-
+    return {
+        codigo,
+        eventoId: eid,
+        nomeEvento: evento.nome,
+        totalInscritos: inscritos.length,
+        inscritos,
+        arquivo: arquivoInfo.caminho,
+        formato: arquivoInfo.formato
+    };
 }

@@ -6,6 +6,7 @@ class Tabelas{
         this.criarTabelaAcao();
         this.criarTabelaInscricao();
         this.criarTabelaCertificado();
+        this.criarTabelaEventoImagem();
     }
  
     criarTabelaUsuario(){
@@ -14,10 +15,10 @@ class Tabelas{
         usuarioId INT AUTO_INCREMENT PRIMARY KEY,
         nome VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
-        matricula INT(20) UNIQUE,
+        matricula VARCHAR(50) UNIQUE,
         tipo int NOT NULL,
         siape varchar(255) UNIQUE,
-        senha VARCHAR(20) NOT NULL,
+        senha VARCHAR(255) NOT NULL,
         adm BOOLEAN NOT NULL DEFAULT FALSE
     );
         `;

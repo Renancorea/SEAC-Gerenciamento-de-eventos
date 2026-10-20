@@ -1,11 +1,16 @@
-import { filtrarEventos, pesquisarEventos, cadastrarEvento, deletarEvento, editarEvento, listarDetalhesEvento, listarEventos } from "../services/servicoEvento.js";
+import {
+    filtrarEventos,
+    pesquisarEventos,
+    cadastrarEvento,
+    deletarEvento,
+    editarEvento,
+    listarDetalhesEvento,
+    listarEventos
+} from "../services/servicoEvento.js";
 
-
-export function CadastrarEvento(requisicao, resposta) {
-
+export async function CadastrarEvento(requisicao, resposta) {
     try {
-        
-        const evento = cadastrarEvento(requisicao.body);
+        const evento = await cadastrarEvento(requisicao.body);
 
         return resposta.status(201).json({
             mensagem: "Evento cadastrado com sucesso",
@@ -13,19 +18,33 @@ export function CadastrarEvento(requisicao, resposta) {
         });
 
     } catch (erro) {
-
         return resposta.status(400).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function ListarEventos(requisicao, resposta) {
-
+export async function ListarEventos(requisicao, resposta) {
     try {
+        // Se houver parâmetro de pesquisa na rota principal
+        if (requisicao.query.pesquisa) {
+            const eventos = await pesquisarEventos(requisicao.query.pesquisa);
+            return resposta.status(200).json({
+                mensagem: "Eventos listados com sucesso",
+                eventos
+            });
+        }
 
-        const eventos = listarEventos();
+        // Se houver filtros de categoria, tipo, data ou cargaHoraria
+        if (requisicao.query.tipo || requisicao.query.categoria || requisicao.query.data || requisicao.query.cargaHoraria) {
+            const eventos = await filtrarEventos(requisicao.query);
+            return resposta.status(200).json({
+                mensagem: "Eventos listados com sucesso",
+                eventos
+            });
+        }
+
+        const eventos = await listarEventos();
 
         return resposta.status(200).json({
             mensagem: "Eventos listados com sucesso",
@@ -33,39 +52,36 @@ export function ListarEventos(requisicao, resposta) {
         });
 
     } catch (erro) {
-
         return resposta.status(400).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function ListarDetalhesEventos(requisicao, resposta) {
-
+export async function ListarDetalhesEventos(requisicao, resposta) {
     try {
-        const id = Number(requisicao.params.id);
-        const detalhesEventos = listarDetalhesEvento(id);
+        const id = Number(requisicao.params.id || requisicao.query.id);
+        const detalhesEventos = await listarDetalhesEvento(id);
 
         return resposta.status(200).json({
-            mensagem: "Detalhes dos eventos listados com sucesso",
+            mensagem: "Detalhes do evento listados com sucesso",
             detalhesEventos
         });
 
     } catch (erro) {
-
-        return resposta.status(400).json({
+        const status = erro.message.includes("não encontrado") ? 404 : 400;
+        return resposta.status(status).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function EditarEvento(requisicao, resposta) {
-
+export async function EditarEvento(requisicao, resposta) {
     try {
+        const idEvento = Number(requisicao.params.id);
+        const idOrganizador = Number(requisicao.body.idOrganizador || requisicao.query.idOrganizador);
 
-        const eventoEditado = editarEvento(requisicao.params.id, requisicao.body.idOrganizador, requisicao.body);
+        const eventoEditado = await editarEvento(idEvento, idOrganizador, requisicao.body);
 
         return resposta.status(200).json({
             mensagem: "Evento editado com sucesso",
@@ -73,39 +89,36 @@ export function EditarEvento(requisicao, resposta) {
         });
 
     } catch (erro) {
-
-        return resposta.status(400).json({
+        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        return resposta.status(status).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function DeletarEvento(requisicao, resposta) {
-
+export async function DeletarEvento(requisicao, resposta) {
     try {
+        const idEvento = Number(requisicao.params.id);
+        const idOrganizador = Number(requisicao.body.idOrganizador || requisicao.query.idOrganizador);
 
-        deletarEvento(requisicao.params.id, requisicao.body.idOrganizador);
+        await deletarEvento(idEvento, idOrganizador);
 
         return resposta.status(200).json({
             mensagem: "Evento deletado com sucesso"
         });
 
     } catch (erro) {
-
-        return resposta.status(400).json({
+        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        return resposta.status(status).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function PesquisarEventos(requisicao, resposta) {
-
+export async function PesquisarEventos(requisicao, resposta) {
     try {
-
-        const pesquisa = requisicao.query.pesquisa;
-        const eventosEncontrados = pesquisarEventos(pesquisa);
+        const pesquisa = requisicao.query.pesquisa || "";
+        const eventosEncontrados = await pesquisarEventos(pesquisa);
 
         return resposta.status(200).json({
             mensagem: "Eventos encontrados com sucesso",
@@ -113,20 +126,15 @@ export function PesquisarEventos(requisicao, resposta) {
         });
 
     } catch (erro) {
-
         return resposta.status(400).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function FiltrarEventos(requisicao, resposta) {
-
+export async function FiltrarEventos(requisicao, resposta) {
     try {
-
-        const filtro = requisicao.query.filtro;
-        const eventosFiltrados = filtrarEventos(filtro);
+        const eventosFiltrados = await filtrarEventos(requisicao.query);
 
         return resposta.status(200).json({
             mensagem: "Eventos filtrados com sucesso",
@@ -134,10 +142,8 @@ export function FiltrarEventos(requisicao, resposta) {
         });
 
     } catch (erro) {
-
         return resposta.status(400).json({
             mensagem: erro.message
         });
-
     }
-};
+}

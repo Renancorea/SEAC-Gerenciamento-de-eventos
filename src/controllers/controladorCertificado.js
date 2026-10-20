@@ -1,10 +1,7 @@
 import { gerarCertificado } from "../services/servicoCertificado.js";
 
-
 export async function GerarCertificado(requisicao, resposta) {
-
     try {
-
         const certificado = await gerarCertificado(requisicao.body);
 
         return resposta.status(201).json({
@@ -13,10 +10,9 @@ export async function GerarCertificado(requisicao, resposta) {
         });
 
     } catch (erro) {
-
-        return resposta.status(400).json({
+        const status = erro.message.includes("não encontrado") ? 404 : 400;
+        return resposta.status(status).json({
             mensagem: erro.message
         });
-
     }
 }

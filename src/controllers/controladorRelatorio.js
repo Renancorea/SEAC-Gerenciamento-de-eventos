@@ -1,10 +1,12 @@
-import { relatorioGeralUsuarios, relatorioGeralEventos, relatorioUsuariosEvento } from '../services/servicoRelatorio.js';
+import {
+    relatorioGeralUsuarios,
+    relatorioGeralEventos,
+    relatorioUsuariosEvento
+} from "../services/servicoRelatorio.js";
 
-export function RelatorioGeralUsuarios(requisicao, resposta) {
-
+export async function RelatorioGeralUsuarios(requisicao, resposta) {
     try {
-
-        const relatorio = relatorioGeralUsuarios();
+        const relatorio = await relatorioGeralUsuarios();
 
         return resposta.status(200).json({
             mensagem: "Relatório geral de usuários gerado com sucesso",
@@ -12,48 +14,49 @@ export function RelatorioGeralUsuarios(requisicao, resposta) {
         });
 
     } catch (erro) {
-
         return resposta.status(400).json({
             mensagem: erro.message
         });
-
     }
 }
 
-export function RelatorioGeralEventos(requisicao, resposta) {
-
+export async function RelatorioGeralEventos(requisicao, resposta) {
     try {
-
-        const relatorio = relatorioGeralEventos();
+        const relatorio = await relatorioGeralEventos();
 
         return resposta.status(200).json({
-            mensagem: "Relatório geral de eventos gerado com sucesso", relatorio
+            mensagem: "Relatório geral de eventos gerado com sucesso",
+            relatorio
         });
 
     } catch (erro) {
-
         return resposta.status(400).json({
             mensagem: erro.message
         });
-
     }
-} 
-export function RelatorioUsuariosEvento(requisicao, resposta) {
-    
-    try {
+}
 
-        const usuarioId = Number(requisicao.params.usuarioId);
-        const relatorio = relatorioUsuariosEvento(usuarioId);
+export async function RelatorioUsuariosEvento(requisicao, resposta) {
+    try {
+        const idEvento = Number(requisicao.params.eventoId || requisicao.params.usuarioId || requisicao.query.eventoId);
+
+        if (!idEvento) {
+            return resposta.status(400).json({
+                mensagem: "Identificador do evento não informado."
+            });
+        }
+
+        const relatorio = await relatorioUsuariosEvento(idEvento);
 
         return resposta.status(200).json({
-            mensagem: "Relatório de usuarios em um evento gerado com sucesso", relatorio
+            mensagem: "Relatório de usuários do evento gerado com sucesso",
+            relatorio
         });
 
     } catch (erro) {
-
-        return resposta.status(400).json({
+        const status = erro.message.includes("não encontrado") ? 404 : 400;
+        return resposta.status(status).json({
             mensagem: erro.message
         });
-
     }
 }
