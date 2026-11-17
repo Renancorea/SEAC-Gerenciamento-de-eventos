@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { GerarCertificado } from "../controllers/controladorCertificado.js";
+import {
+    GerarCertificado,
+    MeusCertificados,
+    ListarCertificadosPorUsuario
+} from "../controllers/controladorCertificado.js";
+import { autenticarUsuario } from "../middlewares/autenticacao.js";
 
 const router = Router();
 
-router.post("/", GerarCertificado);
-router.post("/gerar", GerarCertificado);
+router.get("/meus", autenticarUsuario, MeusCertificados);
+router.get("/usuario/:usuarioId", autenticarUsuario, ListarCertificadosPorUsuario);
+router.post("/", autenticarUsuario, GerarCertificado);
+router.post("/gerar", autenticarUsuario, GerarCertificado);
 
 export default router;

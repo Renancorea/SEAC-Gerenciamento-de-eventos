@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEAC - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="login.css">
 </head>
 
 <body>
 
     <!-- CABEÇALHO -->
     <header class="cabecalho">
-        <div class="logo-seac">
-            <img src="../imagens/SEAC.png.jpeg" alt="Logo SEAC">
-        </div>
+        <a href="../inicio/" class="logo-seac" aria-label="Voltar para o início">
+            <img src="/assets/logoSeac.png" alt="Logo SEAC">
+        </a>
 
         <a href="../cadastro/" class="botao-cadastro">
             Cadastre-se
@@ -45,7 +45,7 @@
             </div>
 
             <div class="logo-ifce">
-                <img src="../imagens/IFCE.png.png" alt="IFCE">
+                <img src="/assets/logoIfce.png" alt="IFCE">
             </div>
 
         </section>
@@ -54,7 +54,7 @@
         <!-- LADO DIREITO -->
         <section class="lado-direito">
 
-            <div class="formulario">
+            <form class="formulario" id="formLogin" novalidate>
 
                 <h2>Bem-vindo de volta!</h2>
 
@@ -82,9 +82,10 @@
 
                 </div>
 
+                <div id="feedbackLogin" class="feedback-mensagem" role="alert" aria-live="polite"></div>
 
                 <!-- MATRÍCULA / SIAPE -->
-                <label id="labelIdentificacao">
+                <label id="labelIdentificacao" for="identificacao">
                     Matrícula
                 </label>
 
@@ -92,11 +93,13 @@
                     type="text"
                     id="identificacao"
                     placeholder="Digite sua matrícula"
+                    autocomplete="username"
+                    required
                 >
 
 
                 <!-- SENHA -->
-                <label>
+                <label for="senhaLogin">
                     Senha
                 </label>
 
@@ -104,22 +107,25 @@
 
                     <input
                         type="password"
+                        id="senhaLogin"
                         placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
                     >
 
-                    <span>👁</span>
+                    <span id="toggleSenha" role="button" tabindex="0" aria-label="Mostrar ou ocultar senha">👁</span>
 
                 </div>
 
 
                 <!-- ESQUECEU SENHA -->
-                <a href="#" class="esqueci">
+                <a href="#" class="esqueci" id="linkEsqueci">
                     Esqueceu sua senha?
                 </a>
 
 
                 <!-- ENTRAR -->
-                <button type="button" class="botao-entrar">
+                <button type="submit" class="botao-entrar" id="btnEntrar">
                     Entrar
                 </button>
 
@@ -139,16 +145,16 @@
                 <!-- GOOGLE + SUAP -->
                 <div class="login-opcoes">
 
-                    <button type="button" class="opcao-social">
+                    <button type="button" class="opcao-social" id="btnGoogle" title="Entrar com Google">
                         <img
-                            src="../imagens/google.png"
+                            src="/assets/logoGoogle.png"
                             alt="Google"
                         >
                     </button>
 
-                    <button type="button" class="opcao-social">
+                    <button type="button" class="opcao-social" id="btnSuap" title="Entrar com SUAP">
                         <img
-                            src="../imagens/suap.ifrr.edu.br 1.png"
+                            src="/assets/iconSuapTexto.png"
                             alt="SUAP"
                         >
                     </button>
@@ -167,7 +173,7 @@
                     Criar uma conta
                 </a>
 
-            </div>
+            </form>
 
         </section>
 
@@ -188,7 +194,8 @@
     </footer>
 
 
-    <script src="script.js"></script>
+    <script src="../shared/api.js"></script>
+    <script src="login.js"></script>
 
 </body>
 </html>

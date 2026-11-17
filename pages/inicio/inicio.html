@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEAC - Início</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="inicio.css">
 </head>
 <body>
 
     <header class="cabecalho">
         <a href="./" class="marca" aria-label="Página inicial SEAC">
-            <img src="../imagens/SE AC.png.png" alt="SEAC">
+            <img src="/assets/logoSeac.png" alt="SEAC">
         </a>
 
         <div class="busca">
@@ -18,7 +18,7 @@
             <input id="campoBusca" type="search" placeholder="Buscar eventos ou organizadores..." autocomplete="off">
         </div>
 
-        <nav class="acoes">
+        <nav class="acoes" id="acoesUsuario">
             <a href="../login/" class="link-entrar">Entrar</a>
             <a href="../cadastro/" class="botao-topo">Cadastre-se</a>
         </nav>
@@ -34,9 +34,9 @@
                 <h1>SEAC</h1>
                 <h2>Sistema de Eventos<br>Acadêmicos e Científicos</h2>
 
-                <div class="hero-botoes">
+                <div class="hero-botoes" id="heroBotoes">
                     <a href="#eventos" class="botao-principal">Ver Eventos</a>
-                    <a href="../cadastro/" class="botao-secundario">Criar conta</a>
+                    <a href="../cadastro/" class="botao-secundario" id="heroSecundario">Criar conta</a>
                 </div>
             </div>
 
@@ -52,10 +52,12 @@
             <div class="cabecalho-catalogo">
                 <div>
                     <h2>Catálogo de Eventos</h2>
-                    <p id="contadorEventos">4 Eventos encontrados</p>
+                    <p id="contadorEventos">Carregando eventos...</p>
                 </div>
 
                 <div class="filtros">
+                    <button type="button" id="btnNovoEventoCatalogo" class="botao-novo-evento" style="display: none;">+ Novo Evento</button>
+
                     <select id="filtroTipo" aria-label="Filtrar por tipo">
                         <option value="todos">Todos os tipos</option>
                         <option value="cientifico">Científico</option>
@@ -71,131 +73,106 @@
                 </div>
             </div>
 
-            <div class="grade-eventos" id="gradeEventos">
-                <article class="evento-card" data-tipo="cientifico" data-data="2026-09-23" data-busca="nome do evento organizador local">
-                    <div class="imagem-evento floresta-1">
-                     
-                         <div class="data-evento">
-            25
-            <span>Set</span>
-        </div>
+            <div id="feedbackCatalogo" class="feedback-catalogo" role="status" aria-live="polite"></div>
 
-        <div class="tipo-evento">
-            Tipo
-        </div>
-                        
-                        <span class="etiqueta-tipo">Tipo</span>
-                        <span class="data-evento"><strong>23</strong><small>Set</small></span>
-                       
-                    </div>
-                    <div class="conteudo-evento">
-                        <h3>Nome do evento</h3>
-                       
-                        <p class="organizador">Nome do organizador</p>
-                      <span class="local-evento">
-    <img src="../imagens/localização.png.png" alt="Local">
-    Local
-</span>
-                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
-                    </div>
-                </article>
-
-                <article class="evento-card" data-tipo="academico" data-data="2026-09-25" data-busca="nome do evento organizador local">
-                    <div class="imagem-evento floresta-2">
-
-                               <div class="data-evento">
-            25
-            <span>Set</span>
-        </div>
-
-        <div class="tipo-evento">
-            Tipo
-        </div>
-
-                        <span class="etiqueta-tipo">Tipo</span>
-                        <span class="data-evento"><strong>25</strong><small>Set</small></span>
-                    </div>
-                    <div class="conteudo-evento">
-                        <h3>Nome do evento</h3>
-                        <p class="organizador">Nome do organizador</p>
-                         <p class="organizador">Nome do organizador</p>
-
-
-
-                      <span class="local-evento">
-    <img src="../imagens/localização.png.png" alt="Local">
-    Local
-</span>
-                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
-                    </div>
-                </article>
-
-                <article class="evento-card" data-tipo="cultural" data-data="2026-09-27" data-busca="nome do evento organizador local">
-                    <div class="imagem-evento floresta-3">
-                      
-<div class="data-evento">
-            25
-            <span>Set</span>
-        </div>
-
-        <div class="tipo-evento">
-            Tipo
-        </div>
-                        
-                        <span class="etiqueta-tipo">Tipo</span>
-                        <span class="data-evento"><strong>27</strong><small>Set</small></span>
-                    </div>
-                    <div class="conteudo-evento">
-                        <h3>Nome do evento</h3>
-                        <p class="organizador">Nome do organizador</p>
-                
-                     <span class="local-evento">
-                       <img src="../imagens/localização.png.png" alt="Local">
-                        Local
-</span>
-
-                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
-                    </div>
-                </article>
-
-                <article class="evento-card" data-tipo="cientifico" data-data="2026-09-30" data-busca="nome do evento organizador local">
-                    <div class="imagem-evento floresta-4">
-                          
-                    <div class="data-evento">
-            25
-            <span>Set</span>
-        </div>
-
-        <div class="tipo-evento">
-            Tipo
-        </div>
-
-                        <span class="etiqueta-tipo">Tipo</span>
-                        <span class="data-evento"><strong>30</strong><small>Set</small></span>
-                    </div>
-                    <div class="conteudo-evento">
-                        <h3>Nome do evento</h3>
-                        <p class="organizador">Nome do organizador</p>
-
-                          <span class="local-evento">
-                       <img src="../imagens/localização.png.png" alt="Local">
-                        Local
-</span>
-
-
-                        <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
-                    </div>
-                </article>
-            </div>
+            <div class="grade-eventos" id="gradeEventos"></div>
 
             <p class="sem-resultados" id="semResultados">Nenhum evento encontrado.</p>
         </section>
     </main>
 
+    <!-- MODAL DETALHES DO EVENTO -->
+    <div id="modalEvento" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalEventoTitulo">
+        <div class="modal-caixa modal-largo">
+            <button type="button" class="modal-fechar" data-fechar="modalEvento" aria-label="Fechar">×</button>
+            <div id="modalEventoConteudo"></div>
+        </div>
+    </div>
+
+    <!-- MODAL CRIAR / EDITAR EVENTO -->
+    <div id="modalFormularioEvento" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tituloFormEvento">
+        <div class="modal-caixa">
+            <button type="button" class="modal-fechar" data-fechar="modalFormularioEvento" aria-label="Fechar">×</button>
+            <h2 id="tituloFormEvento" class="modal-titulo">Novo Evento</h2>
+            <div id="feedbackFormEvento" class="feedback-modal" role="alert"></div>
+            <form id="formEvento" class="form-modal">
+                <input type="hidden" id="eventoIdForm">
+                <div class="form-grid">
+                    <div class="campo-modal campo-full">
+                        <label for="evNome">Nome do evento *</label>
+                        <input type="text" id="evNome" required placeholder="Ex: Semana de Ciência e Tecnologia">
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evLocal">Local *</label>
+                        <input type="text" id="evLocal" required placeholder="Ex: Auditório Central">
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evData">Data *</label>
+                        <input type="date" id="evData" required>
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evHorario">Horário *</label>
+                        <input type="time" id="evHorario" required>
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evTipo">Tipo *</label>
+                        <select id="evTipo" required>
+                            <option value="cientifico">Científico</option>
+                            <option value="academico">Acadêmico</option>
+                            <option value="cultural">Cultural</option>
+                        </select>
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evCategoria">Categoria</label>
+                        <input type="text" id="evCategoria" placeholder="Ex: Tecnologia, Pesquisa">
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evAssentos">Assentos (vagas) *</label>
+                        <input type="number" id="evAssentos" min="1" required placeholder="Ex: 80">
+                    </div>
+                    <div class="campo-modal">
+                        <label for="evCarga">Carga horária (h)</label>
+                        <input type="number" id="evCarga" min="1" step="0.5" placeholder="Ex: 8">
+                    </div>
+                    <div class="campo-modal campo-full">
+                        <label for="evDescricao">Descrição</label>
+                        <textarea id="evDescricao" rows="3" placeholder="Descreva o evento, público-alvo e objetivos..."></textarea>
+                    </div>
+                    <div class="campo-modal campo-full">
+                        <label for="evImagem">Imagem de capa (opcional — PNG, JPG, WEBP até 3MB)</label>
+                        <input type="file" id="evImagem" accept="image/png,image/jpeg,image/webp">
+                    </div>
+                </div>
+                <div class="modal-acoes-rodape">
+                    <button type="button" class="btn-secundario-modal" data-fechar="modalFormularioEvento">Cancelar</button>
+                    <button type="submit" class="btn-primario-modal" id="btnSalvarEvento">Salvar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL MINHA ÁREA (INSCRIÇÕES E CERTIFICADOS) -->
+    <div id="modalMinhaArea" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tituloMinhaArea">
+        <div class="modal-caixa modal-largo">
+            <button type="button" class="modal-fechar" data-fechar="modalMinhaArea" aria-label="Fechar">×</button>
+            <h2 id="tituloMinhaArea" class="modal-titulo">Minhas Inscrições e Certificados</h2>
+            <div id="conteudoMinhaArea"></div>
+        </div>
+    </div>
+
+    <!-- MODAL RELATÓRIOS (ORGANIZADORES / ADM) -->
+    <div id="modalRelatorios" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tituloRelatorios">
+        <div class="modal-caixa modal-largo">
+            <button type="button" class="modal-fechar" data-fechar="modalRelatorios" aria-label="Fechar">×</button>
+            <h2 id="tituloRelatorios" class="modal-titulo">Relatórios do Sistema</h2>
+            <div id="conteudoRelatorios"></div>
+        </div>
+    </div>
+
     <footer class="rodape">
         <div class="rodape-marca">
             <div class="logo-rodape">
-                <img src="../imagens/LOGO.png.png" alt="SEAC">
+                <img src="/assets/logoSeac.png" alt="SEAC">
                 <strong>SEAC</strong>
             </div>
             <p>Plataforma oficial de eventos<br>científicos e acadêmicos do<br>Instituto Federal Campus Cedro</p>
@@ -204,8 +181,8 @@
         <div class="rodape-coluna">
             <h3>NAVEGAÇÃO</h3>
             <a href="#eventos">Catálogo de eventos</a>
-            <a href="../login/">Entrar</a>
-            <a href="../cadastro/">Criar conta</a>
+            <a href="../login/" id="rodapeLogin">Entrar</a>
+            <a href="../cadastro/" id="rodapeCadastro">Criar conta</a>
         </div>
 
         <div class="rodape-coluna">
@@ -219,6 +196,7 @@
         <div class="linha-rodape"></div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="../shared/api.js"></script>
+    <script src="inicio.js"></script>
 </body>
 </html>

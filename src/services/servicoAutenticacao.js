@@ -58,23 +58,24 @@ export async function login(dados) {
 
     // Criar token de sessão para encerramento de sessão coerente
     const token = crypto.randomBytes(32).toString("hex");
-    sessoesAtivas.set(token, {
+    const usuarioLimpo = {
         usuarioId: usuario.usuarioId,
-        tipo: usuario.tipo,
         nome: usuario.nome,
+        email: usuario.email,
+        matricula: usuario.matricula,
+        siape: usuario.siape,
+        tipo: Number(usuario.tipo),
+        adm: Number(usuario.tipo) === 0 ? Boolean(usuario.adm) : false
+    };
+
+    sessoesAtivas.set(token, {
+        ...usuarioLimpo,
         criadoEm: new Date()
     });
 
-    // Exclusão estrita de senhas e hashes das respostas da API
-    const { senha: _, ...usuarioSemSenha } = usuario;
-
     return {
         token,
-        usuario: {
-            ...usuarioSemSenha,
-            tipo: Number(usuario.tipo),
-            adm: Boolean(usuario.adm)
-        }
+        usuario: usuarioLimpo
     };
 }
 
@@ -86,6 +87,32 @@ export async function logout(token) {
     return true;
 }
 
-export function verificarSessao(token) {
-    return sessoesAtivas.get(token) || null;
+export async function verificarSessao(token) {
+    if (!token) return null;
+    const sessao = sessoesAtivas.get(token);
+    if (!sessao) return null;
+
+    // Revalida o usuário no banco para não confiar em cache desatualizado
+    const resultado = await executar(
+        `SELECT usuarioId, nome, email, matricula, siape, tipo, adm
+         FROM Usuario
+         WHERE usuarioId = ?`,
+        [sessao.usuarioId]
+    );
+
+    if (!resultado || resultado.length === 0) {
+        sessoesAtivas.delete(token);
+        return null;
+    }
+
+    const u = resultado[0];
+    return {
+        usuarioId: u.usuarioId,
+        nome: u.nome,
+        email: u.email,
+        matricula: u.matricula,
+        siape: u.siape,
+        tipo: Number(u.tipo),
+        adm: Number(u.tipo) === 0 ? Boolean(u.adm) : false
+    };
 }

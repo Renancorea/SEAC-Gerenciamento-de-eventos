@@ -326,8 +326,43 @@ input:focus {
     cursor: pointer;
 }
 
-.botao-entrar:hover {
+.botao-entrar:hover:not(:disabled) {
     background: #1d6034;
+}
+
+.botao-entrar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.feedback-mensagem {
+    display: none;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+}
+
+.feedback-mensagem.erro {
+    display: block;
+    background: #fdecec;
+    color: #9b1c1c;
+    border: 1px solid #f5bcbc;
+}
+
+.feedback-mensagem.sucesso {
+    display: block;
+    background: #eaf7ee;
+    color: #166534;
+    border: 1px solid #b7e4c7;
+}
+
+.feedback-mensagem.info {
+    display: block;
+    background: #eef5f0;
+    color: #123a27;
+    border: 1px solid #c5dccb;
 }
 
 

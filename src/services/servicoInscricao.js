@@ -8,7 +8,6 @@ export async function inscrever(idUsuario, idEvento) {
     const uid = Number(idUsuario);
     const eid = Number(idEvento);
 
-    // Validação da existência do usuário
     const usuarioResultado = await executar(
         `SELECT usuarioId, nome, tipo FROM Usuario WHERE usuarioId = ?`,
         [uid]
@@ -18,7 +17,6 @@ export async function inscrever(idUsuario, idEvento) {
         throw new Error("Usuário não encontrado.");
     }
 
-    // Validação da existência do evento
     const eventoResultado = await executar(
         `SELECT eventoId, nome, assentos FROM Evento WHERE eventoId = ?`,
         [eid]
@@ -30,7 +28,6 @@ export async function inscrever(idUsuario, idEvento) {
 
     const evento = eventoResultado[0];
 
-    // Impedimento de inscrições duplicadas usando a tabela correta Inscricao
     const inscricaoExistente = await executar(
         `SELECT * FROM Inscricao WHERE usuarioId = ? AND eventoId = ?`,
         [uid, eid]
@@ -40,7 +37,6 @@ export async function inscrever(idUsuario, idEvento) {
         throw new Error("Usuário já está inscrito neste evento.");
     }
 
-    // Verificação de capacidade máxima e cálculo de vagas disponíveis
     const inscricoesAtuais = await executar(
         `SELECT inscricaoId FROM Inscricao WHERE eventoId = ?`,
         [eid]
@@ -50,7 +46,6 @@ export async function inscrever(idUsuario, idEvento) {
         throw new Error("Capacidade máxima do evento atingida. Não há assentos disponíveis.");
     }
 
-    // Inserção na tabela Inscricao (presente inicia como false)
     const resultadoInsert = await executar(
         `INSERT INTO Inscricao (usuarioId, eventoId, presente) VALUES (?, ?, ?)`,
         [uid, eid, false]
@@ -64,7 +59,7 @@ export async function inscrever(idUsuario, idEvento) {
     };
 }
 
-export async function registrarPresenca(idUsuario, idEvento) {
+export async function registrarPresenca(idUsuario, idEvento, presente = true, usuarioOrganizador = null) {
     if (!idUsuario || !idEvento) {
         throw new Error("Identificador do usuário e do evento são obrigatórios.");
     }
@@ -72,7 +67,19 @@ export async function registrarPresenca(idUsuario, idEvento) {
     const uid = Number(idUsuario);
     const eid = Number(idEvento);
 
-    // Impedimento de registrar presença de quem não está inscrito
+    const eventoResultado = await executar(
+        `SELECT eventoId, idOrganizador FROM Evento WHERE eventoId = ?`,
+        [eid]
+    );
+
+    if (eventoResultado.length === 0) {
+        throw new Error("Evento não encontrado.");
+    }
+
+    if (usuarioOrganizador && !usuarioOrganizador.adm && Number(eventoResultado[0].idOrganizador) !== Number(usuarioOrganizador.usuarioId)) {
+        throw new Error("Acesso não autorizado: apenas o organizador responsável pelo evento pode registrar presença.");
+    }
+
     const inscricao = await executar(
         `SELECT * FROM Inscricao WHERE usuarioId = ? AND eventoId = ?`,
         [uid, eid]
@@ -82,30 +89,31 @@ export async function registrarPresenca(idUsuario, idEvento) {
         throw new Error("Usuário não está inscrito neste evento.");
     }
 
+    const presenteBool = Boolean(presente);
+
     await executar(
         `UPDATE Inscricao
          SET presente = ?
          WHERE usuarioId = ? AND eventoId = ?`,
-        [true, uid, eid]
+        [presenteBool ? 1 : 0, uid, eid]
     );
 
     return {
         usuarioId: uid,
         eventoId: eid,
-        presente: true
+        presente: presenteBool
     };
 }
 
-export async function listarInscritos(idEvento) {
+export async function listarInscritos(idEvento, usuarioOrganizador = null) {
     if (!idEvento) {
         throw new Error("Identificador do evento não informado.");
     }
 
     const eid = Number(idEvento);
 
-    // Valida se o evento existe e obtém a quantidade de assentos
     const eventoResultado = await executar(
-        `SELECT eventoId, nome, assentos FROM Evento WHERE eventoId = ?`,
+        `SELECT eventoId, nome, assentos, idOrganizador FROM Evento WHERE eventoId = ?`,
         [eid]
     );
 
@@ -115,7 +123,10 @@ export async function listarInscritos(idEvento) {
 
     const evento = eventoResultado[0];
 
-    // Retorna apenas os inscritos do evento solicitado com dados do usuário
+    if (usuarioOrganizador && !usuarioOrganizador.adm && Number(evento.idOrganizador) !== Number(usuarioOrganizador.usuarioId)) {
+        throw new Error("Acesso não autorizado: apenas o organizador responsável pelo evento pode visualizar os inscritos.");
+    }
+
     const inscritos = await executar(
         `SELECT i.inscricaoId, i.usuarioId, i.eventoId, i.presente, i.dataInscricao,
                 u.nome, u.matricula, u.siape, u.email
@@ -134,11 +145,14 @@ export async function listarInscritos(idEvento) {
         totalAssentos: evento.assentos,
         quantidadeInscritos,
         assentosDisponiveis,
-        inscritos
+        inscritos: inscritos.map(i => ({
+            ...i,
+            presente: Boolean(i.presente)
+        }))
     };
 }
 
-export async function listarPresentes(idEvento) {
+export async function listarPresentes(idEvento, usuarioOrganizador = null) {
     if (!idEvento) {
         throw new Error("Identificador do evento não informado.");
     }
@@ -146,7 +160,7 @@ export async function listarPresentes(idEvento) {
     const eid = Number(idEvento);
 
     const eventoResultado = await executar(
-        `SELECT eventoId, nome FROM Evento WHERE eventoId = ?`,
+        `SELECT eventoId, nome, idOrganizador FROM Evento WHERE eventoId = ?`,
         [eid]
     );
 
@@ -155,6 +169,10 @@ export async function listarPresentes(idEvento) {
     }
 
     const evento = eventoResultado[0];
+
+    if (usuarioOrganizador && !usuarioOrganizador.adm && Number(evento.idOrganizador) !== Number(usuarioOrganizador.usuarioId)) {
+        throw new Error("Acesso não autorizado: apenas o organizador responsável pelo evento pode visualizar os presentes.");
+    }
 
     const presentes = await executar(
         `SELECT i.inscricaoId, i.usuarioId, i.eventoId, i.presente, i.dataInscricao,
@@ -169,7 +187,10 @@ export async function listarPresentes(idEvento) {
         eventoId: eid,
         nomeEvento: evento.nome,
         quantidadePresentes: presentes.length,
-        presentes
+        presentes: presentes.map(p => ({
+            ...p,
+            presente: Boolean(p.presente)
+        }))
     };
 }
 
@@ -197,4 +218,26 @@ export async function verificarInscricao(idUsuario, idEvento) {
         inscrito: true,
         presente: Boolean(inscricao[0].presente)
     };
+}
+
+export async function listarInscricoesUsuario(idUsuario) {
+    const uid = Number(idUsuario);
+    if (!uid) {
+        throw new Error("Identificador do usuário não informado.");
+    }
+
+    const inscricoes = await executar(
+        `SELECT i.inscricaoId, i.usuarioId, i.eventoId, i.presente, i.dataInscricao,
+                e.nome AS nomeEvento, e.data AS dataEvento, e.horario AS horarioEvento,
+                e.local AS localEvento, e.cargaHoraria
+         FROM Inscricao i
+         INNER JOIN Evento e ON i.eventoId = e.eventoId
+         WHERE i.usuarioId = ?`,
+        [uid]
+    );
+
+    return inscricoes.map(i => ({
+        ...i,
+        presente: Boolean(i.presente)
+    }));
 }

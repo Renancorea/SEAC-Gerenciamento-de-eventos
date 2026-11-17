@@ -4,19 +4,22 @@ import {
     RegistrarPresenca,
     VizualizarInscritos,
     VerificarInscricaoUsuario,
-    VizualizarPresentes
+    VizualizarPresentes,
+    MinhasInscricoes
 } from "../controllers/controladorInscricao.js";
+import { autenticarUsuario, exigirOrganizador } from "../middlewares/autenticacao.js";
 
 const router = Router();
 
-router.post("/inscricao", RealizarInscricao);
-router.post("/", RealizarInscricao);
-router.put("/presenca", RegistrarPresenca);
-router.get("/eventos/:eventoId/inscritos", VizualizarInscritos);
-router.get("/:eventoId/inscritos", VizualizarInscritos);
-router.get("/eventos/:eventoId/presentes", VizualizarPresentes);
-router.get("/:eventoId/presentes", VizualizarPresentes);
-router.get("/usuario/:usuarioId/evento/:eventoId", VerificarInscricaoUsuario);
-router.get("/usuario/:usuarioId/inscricao", VerificarInscricaoUsuario);
+router.post("/inscricao", autenticarUsuario, RealizarInscricao);
+router.post("/", autenticarUsuario, RealizarInscricao);
+router.get("/minhas", autenticarUsuario, MinhasInscricoes);
+router.put("/presenca", autenticarUsuario, exigirOrganizador, RegistrarPresenca);
+router.get("/eventos/:eventoId/inscritos", autenticarUsuario, exigirOrganizador, VizualizarInscritos);
+router.get("/:eventoId/inscritos", autenticarUsuario, exigirOrganizador, VizualizarInscritos);
+router.get("/eventos/:eventoId/presentes", autenticarUsuario, exigirOrganizador, VizualizarPresentes);
+router.get("/:eventoId/presentes", autenticarUsuario, exigirOrganizador, VizualizarPresentes);
+router.get("/usuario/:usuarioId/evento/:eventoId", autenticarUsuario, VerificarInscricaoUsuario);
+router.get("/usuario/:usuarioId/inscricao", autenticarUsuario, VerificarInscricaoUsuario);
 
 export default router;

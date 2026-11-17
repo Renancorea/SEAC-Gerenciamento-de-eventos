@@ -23,7 +23,7 @@ const app = express();
 // Inicialização das tabelas
 Tabelas.initialize(Conexao);
 
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 
 // Rotas da API REST
 app.use("/api/usuarios", rotaUsuario);
@@ -35,15 +35,26 @@ app.use("/api/certificados", rotaCertificado);
 app.use("/api/relatorios", rotaRelatorio);
 app.use("/api/acoes", rotaAcao);
 
-// Servir arquivos estáticos da pasta pages e uploads
-app.use(express.static(path.join(__dirname, "../pages")));
-app.use("/certificados", express.static(path.join(__dirname, "../certificados")));
-app.use("/relatorios", express.static(path.join(__dirname, "../relatorios")));
-
-// Redirecionamento da raiz para a página inicial
+// Rotas amigáveis das páginas existentes (preservando os nomes reais dos arquivos)
 app.get("/", (requisicao, resposta) => {
     resposta.redirect("/inicio/");
 });
+app.get(["/inicio", "/inicio/"], (requisicao, resposta) => {
+    resposta.sendFile(path.join(__dirname, "../pages/inicio/inicio.html"));
+});
+app.get(["/login", "/login/"], (requisicao, resposta) => {
+    resposta.sendFile(path.join(__dirname, "../pages/login/login.html"));
+});
+app.get(["/cadastro", "/cadastro/"], (requisicao, resposta) => {
+    resposta.sendFile(path.join(__dirname, "../pages/cadastro/cadastro.html"));
+});
+
+// Servir arquivos estáticos de pages, assets, uploads, certificados e relatórios
+app.use("/assets", express.static(path.join(__dirname, "../assets")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/certificados", express.static(path.join(__dirname, "../certificados")));
+app.use("/relatorios", express.static(path.join(__dirname, "../relatorios")));
+app.use(express.static(path.join(__dirname, "../pages")));
 
 // Endpoint de verificação da API
 app.get("/api", (requisicao, resposta) => {

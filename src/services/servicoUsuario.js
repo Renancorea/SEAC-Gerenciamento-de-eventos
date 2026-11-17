@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { executar } from "../db/conexao.js";
 
-export async function cadastrar(dados) {
+export async function cadastrar(dados, usuarioAutenticado = null) {
     const {
         nome,
         matricula,
@@ -14,18 +14,27 @@ export async function cadastrar(dados) {
 
     const tipoNumerico = Number(tipo);
 
-    if (tipo === undefined || (tipoNumerico !== 0 && tipoNumerico !== 1)) {
+    if (tipo === undefined || tipo === "" || (tipoNumerico !== 0 && tipoNumerico !== 1)) {
         throw new Error("Tipo de usuário inválido. Informe 0 para Organizador ou 1 para Participante.");
     }
 
-    if (!email || !senha || !nome) {
+    if (!email || !senha || !nome || String(nome).trim() === "") {
         throw new Error("Nome, e-mail e senha são obrigatórios.");
+    }
+
+    const emailNormalizado = String(email).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormalizado)) {
+        throw new Error("Informe um endereço de e-mail válido.");
+    }
+
+    if (String(senha).length < 6) {
+        throw new Error("A senha deve ter pelo menos 6 caracteres.");
     }
 
     // Validação de e-mail duplicado comum a todos os usuários
     const emailResultado = await executar(
         "SELECT usuarioId FROM Usuario WHERE email = ?",
-        [email.trim().toLowerCase()]
+        [emailNormalizado]
     );
 
     if (emailResultado.length > 0) {
@@ -53,8 +62,8 @@ export async function cadastrar(dados) {
             throw new Error("Este SIAPE já está cadastrado.");
         }
 
-        // Organizador pode ser administrador (adm booleano)
-        admFinal = Boolean(adm);
+        // Apenas um administrador autenticado pode conceder permissão administrativa no cadastro
+        admFinal = Boolean(adm) && Boolean(usuarioAutenticado?.adm);
     } else {
         // Participante
         if (!matricula || String(matricula).trim() === "") {
@@ -76,19 +85,19 @@ export async function cadastrar(dados) {
         admFinal = false;
     }
 
-    const senhaHash = await bcrypt.hash(senha, 10);
+    const senhaHash = await bcrypt.hash(String(senha), 10);
 
     const resultadoInsert = await executar(
         `INSERT INTO Usuario
         (nome, matricula, email, tipo, siape, senha, adm)
         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [nome.trim(), matriculaFinal, email.trim().toLowerCase(), tipoNumerico, siapeFinal, senhaHash, admFinal ? 1 : 0]
+        [String(nome).trim(), matriculaFinal, emailNormalizado, tipoNumerico, siapeFinal, senhaHash, admFinal ? 1 : 0]
     );
 
     return {
         usuarioId: resultadoInsert.insertId,
-        nome: nome.trim(),
-        email: email.trim().toLowerCase(),
+        nome: String(nome).trim(),
+        email: emailNormalizado,
         tipo: tipoNumerico,
         matricula: matriculaFinal,
         siape: siapeFinal,

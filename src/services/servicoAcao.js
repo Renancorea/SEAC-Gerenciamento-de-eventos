@@ -1,23 +1,28 @@
 import { executar } from "../db/conexao.js";
 
-export async function cadastrarAcao(dados) {
+async function verificarDonoEvento(eventoId, usuario) {
+    const res = await executar(
+        `SELECT eventoId, idOrganizador FROM Evento WHERE eventoId = ?`,
+        [Number(eventoId)]
+    );
+    if (res.length === 0) {
+        throw new Error("Evento associado não foi encontrado.");
+    }
+    if (usuario && !usuario.adm && Number(res[0].idOrganizador) !== Number(usuario.usuarioId)) {
+        throw new Error("Acesso não autorizado: apenas o organizador responsável pelo evento pode gerenciar suas ações.");
+    }
+    return res[0];
+}
+
+export async function cadastrarAcao(dados, usuario = null) {
     const { nome, eventoId } = dados;
 
-    if (!nome || !eventoId) {
+    if (!nome || String(nome).trim() === "" || !eventoId) {
         throw new Error("Nome da ação e identificador do evento são obrigatórios.");
     }
 
     const eid = Number(eventoId);
-
-    // Validação da existência do evento associado
-    const eventoResultado = await executar(
-        `SELECT eventoId FROM Evento WHERE eventoId = ?`,
-        [eid]
-    );
-
-    if (eventoResultado.length === 0) {
-        throw new Error("Evento associado não foi encontrado.");
-    }
+    await verificarDonoEvento(eid, usuario);
 
     const resultadoInsert = await executar(
         `INSERT INTO Acao (nome, eventoId) VALUES (?, ?)`,
@@ -65,7 +70,7 @@ export async function buscarAcaoPorId(acaoId) {
     return resultado[0];
 }
 
-export async function editarAcao(acaoId, dados) {
+export async function editarAcao(acaoId, dados, usuario = null) {
     if (!acaoId) {
         throw new Error("Identificador da ação não informado.");
     }
@@ -78,6 +83,7 @@ export async function editarAcao(acaoId, dados) {
     }
 
     const acaoExistente = await buscarAcaoPorId(aid);
+    await verificarDonoEvento(acaoExistente.eventoId, usuario);
 
     await executar(
         `UPDATE Acao SET nome = ? WHERE acaoId = ?`,
@@ -91,13 +97,14 @@ export async function editarAcao(acaoId, dados) {
     };
 }
 
-export async function deletarAcao(acaoId) {
+export async function deletarAcao(acaoId, usuario = null) {
     if (!acaoId) {
         throw new Error("Identificador da ação não informado.");
     }
 
     const aid = Number(acaoId);
-    await buscarAcaoPorId(aid);
+    const acaoExistente = await buscarAcaoPorId(aid);
+    await verificarDonoEvento(acaoExistente.eventoId, usuario);
 
     await executar(
         `DELETE FROM Acao WHERE acaoId = ?`,

@@ -1,4 +1,45 @@
+import fs from "fs";
+import path from "path";
 import { executar } from "../db/conexao.js";
+
+async function enriquecerEventos(listaEventos) {
+    if (!listaEventos || listaEventos.length === 0) return [];
+
+    const [usuarios, inscricoes, imagens] = await Promise.all([
+        executar("SELECT usuarioId, nome FROM Usuario"),
+        executar("SELECT eventoId, usuarioId, presente FROM Inscricao"),
+        executar("SELECT * FROM EventoImagem")
+    ]);
+
+    const mapaOrganizadores = new Map();
+    for (const u of usuarios) {
+        mapaOrganizadores.set(Number(u.usuarioId), u.nome);
+    }
+
+    const contagemInscritos = new Map();
+    for (const i of inscricoes) {
+        const eid = Number(i.eventoId);
+        contagemInscritos.set(eid, (contagemInscritos.get(eid) || 0) + 1);
+    }
+
+    const mapaImagens = new Map();
+    for (const img of imagens) {
+        mapaImagens.set(Number(img.eventoId), img.caminho);
+    }
+
+    return listaEventos.map(ev => {
+        const eid = Number(ev.eventoId);
+        const totalInscritos = contagemInscritos.get(eid) || 0;
+        const assentos = Number(ev.assentos) || 0;
+        return {
+            ...ev,
+            organizadorNome: mapaOrganizadores.get(Number(ev.idOrganizador)) || "Organizador IFCE",
+            quantidadeInscritos: totalInscritos,
+            assentosDisponiveis: Math.max(0, assentos - totalInscritos),
+            imagem: mapaImagens.get(eid) || null
+        };
+    });
+}
 
 export async function cadastrarEvento(dados) {
     const {
@@ -15,7 +56,7 @@ export async function cadastrarEvento(dados) {
     } = dados;
 
     if (!nome || !local || !data || !horario || assentos == null || !idOrganizador) {
-        throw new Error("Todos os campos obrigatórios (nome, local, data, horário, assentos, idOrganizador) devem ser preenchidos.");
+        throw new Error("Todos os campos obrigatórios (nome, local, data, horário, assentos, organizador) devem ser preenchidos.");
     }
 
     const assentosNum = Number(assentos);
@@ -24,16 +65,15 @@ export async function cadastrarEvento(dados) {
     }
 
     let cargaNum = 0;
-    if (cargaHoraria != null) {
+    if (cargaHoraria != null && cargaHoraria !== "") {
         cargaNum = Number(cargaHoraria);
         if (isNaN(cargaNum) || cargaNum <= 0) {
             throw new Error("A carga horária deve ser um valor numérico positivo.");
         }
     }
 
-    // Validação da existência do organizador e confirmação de que ele é de fato do tipo Organizador (tipo = 0)
     const organizadorResultado = await executar(
-        "SELECT * FROM Usuario WHERE usuarioId = ?",
+        "SELECT usuarioId, nome, tipo FROM Usuario WHERE usuarioId = ?",
         [Number(idOrganizador)]
     );
 
@@ -55,10 +95,10 @@ export async function cadastrarEvento(dados) {
             local.trim(),
             data,
             horario,
-            descricao || null,
+            descricao ? String(descricao).trim() : null,
             tipo || null,
             assentosNum,
-            categoria || null,
+            categoria ? String(categoria).trim() : null,
             Number(idOrganizador),
             cargaNum
         ]
@@ -70,12 +110,16 @@ export async function cadastrarEvento(dados) {
         local: local.trim(),
         data,
         horario,
-        descricao: descricao || null,
+        descricao: descricao ? String(descricao).trim() : null,
         tipo: tipo || null,
         assentos: assentosNum,
-        categoria: categoria || null,
+        categoria: categoria ? String(categoria).trim() : null,
         idOrganizador: Number(idOrganizador),
-        cargaHoraria: cargaNum
+        organizadorNome: organizador.nome,
+        cargaHoraria: cargaNum,
+        quantidadeInscritos: 0,
+        assentosDisponiveis: assentosNum,
+        imagem: null
     };
 }
 
@@ -84,7 +128,7 @@ export async function listarEventos() {
         `SELECT * FROM Evento ORDER BY data ASC`
     );
 
-    return resultado;
+    return await enriquecerEventos(resultado);
 }
 
 export async function listarDetalhesEvento(idEvento) {
@@ -101,20 +145,32 @@ export async function listarDetalhesEvento(idEvento) {
         throw new Error("Evento não encontrado.");
     }
 
-    const evento = eventoResultado[0];
+    const [eventoEnriquecido] = await enriquecerEventos(eventoResultado);
 
-    const organizadorResultado = await executar(
-        `SELECT usuarioId, nome, email, siape FROM Usuario WHERE usuarioId = ?`,
-        [evento.idOrganizador]
-    );
+    const [organizadorResultado, acoesResultado, imagensResultado] = await Promise.all([
+        executar(
+            `SELECT usuarioId, nome, email, siape FROM Usuario WHERE usuarioId = ?`,
+            [eventoEnriquecido.idOrganizador]
+        ),
+        executar(
+            `SELECT * FROM Acao WHERE eventoId = ?`,
+            [Number(idEvento)]
+        ),
+        executar(
+            `SELECT * FROM EventoImagem WHERE eventoId = ?`,
+            [Number(idEvento)]
+        )
+    ]);
 
     return {
-        evento,
-        organizador: organizadorResultado[0] || null
+        evento: eventoEnriquecido,
+        organizador: organizadorResultado[0] || null,
+        acoes: acoesResultado || [],
+        imagens: imagensResultado || []
     };
 }
 
-export async function deletarEvento(idEvento, idOrganizador) {
+export async function deletarEvento(idEvento, idOrganizador, isAdmin = false) {
     if (!idEvento || !idOrganizador) {
         throw new Error("Identificador do evento e do organizador são obrigatórios.");
     }
@@ -130,20 +186,35 @@ export async function deletarEvento(idEvento, idOrganizador) {
 
     const evento = eventoResultado[0];
 
-    // Impedimento de que um usuário altere ou exclua eventos de outro organizador sem autorização
-    if (Number(evento.idOrganizador) !== Number(idOrganizador)) {
+    if (!isAdmin && Number(evento.idOrganizador) !== Number(idOrganizador)) {
         throw new Error("Acesso não autorizado: você não é o organizador responsável por este evento.");
     }
 
-    await executar(
-        `DELETE FROM Evento WHERE eventoId = ? AND idOrganizador = ?`,
-        [Number(idEvento), Number(idOrganizador)]
+    const certificadosVinculados = await executar(
+        `SELECT certificadoId FROM Certificado WHERE eventoId = ?`,
+        [Number(idEvento)]
     );
+
+    if (certificadosVinculados.length > 0) {
+        throw new Error("Não é possível excluir este evento pois já existem certificados emitidos para ele.");
+    }
+
+    if (isAdmin) {
+        await executar(
+            `DELETE FROM Evento WHERE eventoId = ?`,
+            [Number(idEvento)]
+        );
+    } else {
+        await executar(
+            `DELETE FROM Evento WHERE eventoId = ? AND idOrganizador = ?`,
+            [Number(idEvento), Number(idOrganizador)]
+        );
+    }
 
     return { mensagem: "Evento excluído com sucesso." };
 }
 
-export async function editarEvento(idEvento, idOrganizador, dados) {
+export async function editarEvento(idEvento, idOrganizador, dados, isAdmin = false) {
     if (!idEvento || !idOrganizador) {
         throw new Error("Identificador do evento e do organizador são obrigatórios.");
     }
@@ -159,18 +230,21 @@ export async function editarEvento(idEvento, idOrganizador, dados) {
 
     const evento = eventoResultado[0];
 
-    // Impedimento de que um usuário altere eventos de outro organizador
-    if (Number(evento.idOrganizador) !== Number(idOrganizador)) {
+    if (!isAdmin && Number(evento.idOrganizador) !== Number(idOrganizador)) {
         throw new Error("Acesso não autorizado: você não é o organizador responsável por este evento.");
     }
 
-    const nome = dados.nome !== undefined ? dados.nome.trim() : evento.nome;
-    const local = dados.local !== undefined ? dados.local.trim() : evento.local;
+    const nome = dados.nome !== undefined ? String(dados.nome).trim() : evento.nome;
+    const local = dados.local !== undefined ? String(dados.local).trim() : evento.local;
     const data = dados.data !== undefined ? dados.data : evento.data;
     const horario = dados.horario !== undefined ? dados.horario : evento.horario;
     const descricao = dados.descricao !== undefined ? dados.descricao : evento.descricao;
     const tipo = dados.tipo !== undefined ? dados.tipo : evento.tipo;
     const categoria = dados.categoria !== undefined ? dados.categoria : evento.categoria;
+
+    if (!nome || !local || !data || !horario) {
+        throw new Error("Nome, local, data e horário são obrigatórios.");
+    }
 
     let assentos = evento.assentos;
     if (dados.assentos !== undefined) {
@@ -182,7 +256,7 @@ export async function editarEvento(idEvento, idOrganizador, dados) {
     }
 
     let cargaHoraria = evento.cargaHoraria;
-    if (dados.cargaHoraria !== undefined) {
+    if (dados.cargaHoraria !== undefined && dados.cargaHoraria !== "") {
         const cargaNum = Number(dados.cargaHoraria);
         if (isNaN(cargaNum) || cargaNum <= 0) {
             throw new Error("A carga horária deve ser um valor numérico positivo.");
@@ -213,23 +287,16 @@ export async function editarEvento(idEvento, idOrganizador, dados) {
             categoria,
             cargaHoraria,
             Number(idEvento),
-            Number(idOrganizador)
+            Number(evento.idOrganizador)
         ]
     );
 
-    return {
-        eventoId: Number(idEvento),
-        nome,
-        local,
-        data,
-        horario,
-        descricao,
-        tipo,
-        assentos,
-        categoria,
-        cargaHoraria,
-        idOrganizador: Number(idOrganizador)
-    };
+    const atualizado = await executar(
+        `SELECT * FROM Evento WHERE eventoId = ?`,
+        [Number(idEvento)]
+    );
+    const [enriquecido] = await enriquecerEventos(atualizado);
+    return enriquecido;
 }
 
 export async function pesquisarEventos(pesquisa) {
@@ -238,20 +305,15 @@ export async function pesquisarEventos(pesquisa) {
     }
 
     const termo = String(pesquisa).trim().toLowerCase();
+    const todos = await listarEventos();
 
-    const resultado = await executar(
-        `SELECT * FROM Evento
-         WHERE LOWER(nome) LIKE ?
-         OR LOWER(local) LIKE ?
-         OR LOWER(descricao) LIKE ?`,
-        [
-            `%${termo}%`,
-            `%${termo}%`,
-            `%${termo}%`
-        ]
+    return todos.filter(e =>
+        (e.nome && e.nome.toLowerCase().includes(termo)) ||
+        (e.local && e.local.toLowerCase().includes(termo)) ||
+        (e.descricao && e.descricao.toLowerCase().includes(termo)) ||
+        (e.categoria && e.categoria.toLowerCase().includes(termo)) ||
+        (e.organizadorNome && e.organizadorNome.toLowerCase().includes(termo))
     );
-
-    return resultado;
 }
 
 export async function filtrarEventos(filtros = {}) {
@@ -259,7 +321,8 @@ export async function filtrarEventos(filtros = {}) {
         tipo,
         data,
         categoria,
-        cargaHoraria
+        cargaHoraria,
+        pesquisa
     } = filtros;
 
     const condicoes = [];
@@ -285,13 +348,97 @@ export async function filtrarEventos(filtros = {}) {
         parametros.push(Number(cargaHoraria));
     }
 
+    let resultado;
     if (condicoes.length === 0) {
-        return await listarEventos();
+        resultado = await listarEventos();
+    } else {
+        const sql = `SELECT * FROM Evento WHERE ${condicoes.join(" AND ")} ORDER BY data ASC`;
+        const brutos = await executar(sql, parametros);
+        resultado = await enriquecerEventos(brutos);
     }
 
-    // Combina múltiplos filtros com AND evitando retorno incorreto por uso indevido de OR
-    const sql = `SELECT * FROM Evento WHERE ${condicoes.join(" AND ")} ORDER BY data ASC`;
-    const resultado = await executar(sql, parametros);
+    if (pesquisa && String(pesquisa).trim() !== "") {
+        const termo = String(pesquisa).trim().toLowerCase();
+        resultado = resultado.filter(e =>
+            (e.nome && e.nome.toLowerCase().includes(termo)) ||
+            (e.local && e.local.toLowerCase().includes(termo)) ||
+            (e.descricao && e.descricao.toLowerCase().includes(termo)) ||
+            (e.categoria && e.categoria.toLowerCase().includes(termo)) ||
+            (e.organizadorNome && e.organizadorNome.toLowerCase().includes(termo))
+        );
+    }
 
     return resultado;
+}
+
+export async function salvarImagemEvento(idEvento, idOrganizador, dados, isAdmin = false) {
+    const eid = Number(idEvento);
+    if (!eid) {
+        throw new Error("Identificador do evento não informado.");
+    }
+
+    const eventoResultado = await executar(
+        `SELECT * FROM Evento WHERE eventoId = ?`,
+        [eid]
+    );
+    if (eventoResultado.length === 0) {
+        throw new Error("Evento não encontrado.");
+    }
+
+    const evento = eventoResultado[0];
+    if (!isAdmin && Number(evento.idOrganizador) !== Number(idOrganizador)) {
+        throw new Error("Acesso não autorizado: você não é o organizador responsável por este evento.");
+    }
+
+    const { nomeImagem, imagemBase64 } = dados || {};
+    if (!imagemBase64 || typeof imagemBase64 !== "string") {
+        throw new Error("Arquivo de imagem não enviado.");
+    }
+
+    const match = imagemBase64.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/i);
+    if (!match) {
+        throw new Error("Formato de imagem inválido. Envie PNG, JPG ou WEBP.");
+    }
+
+    const extensao = match[1].toLowerCase() === "jpeg" ? "jpg" : match[1].toLowerCase();
+    const buffer = Buffer.from(match[2], "base64");
+
+    if (buffer.length > 3 * 1024 * 1024) {
+        throw new Error("A imagem deve ter no máximo 3 MB.");
+    }
+
+    const pastaUploads = path.resolve("./uploads/eventos");
+    if (!fs.existsSync(pastaUploads)) {
+        fs.mkdirSync(pastaUploads, { recursive: true });
+    }
+
+    const nomeSeguro = `evento-${eid}-${Date.now()}.${extensao}`;
+    const caminhoDisco = path.join(pastaUploads, nomeSeguro);
+    fs.writeFileSync(caminhoDisco, buffer);
+
+    const caminhoPublico = `/uploads/eventos/${nomeSeguro}`;
+    const nomeOriginal = nomeImagem ? String(nomeImagem).trim().slice(0, 200) : nomeSeguro;
+
+    const insertRes = await executar(
+        `INSERT INTO EventoImagem (nomeImagem, caminho, eventoId) VALUES (?, ?, ?)`,
+        [nomeOriginal, caminhoPublico, eid]
+    );
+
+    return {
+        imagemId: insertRes.insertId,
+        nomeImagem: nomeOriginal,
+        caminho: caminhoPublico,
+        eventoId: eid
+    };
+}
+
+export async function listarImagensEvento(idEvento) {
+    const eid = Number(idEvento);
+    if (!eid) {
+        throw new Error("Identificador do evento não informado.");
+    }
+    return await executar(
+        `SELECT * FROM EventoImagem WHERE eventoId = ?`,
+        [eid]
+    );
 }

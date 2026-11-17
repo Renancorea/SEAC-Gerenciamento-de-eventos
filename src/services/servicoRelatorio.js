@@ -44,7 +44,11 @@ async function gerarPdfRelatorio(html, nomeArquivo) {
         fs.writeFileSync(caminho, html, "utf-8");
     }
 
-    return { caminho, formato };
+    return {
+        caminho,
+        formato,
+        urlDownload: `/relatorios/${path.basename(caminho)}`
+    };
 }
 
 export async function relatorioGeralUsuarios() {
@@ -117,7 +121,8 @@ export async function relatorioGeralUsuarios() {
             email: u.email
         })),
         arquivo: arquivoInfo.caminho,
-        formato: arquivoInfo.formato
+        formato: arquivoInfo.formato,
+        urlDownload: arquivoInfo.urlDownload
     };
 }
 
@@ -189,11 +194,12 @@ export async function relatorioGeralEventos() {
         totalEventos: eventos.length,
         eventos,
         arquivo: arquivoInfo.caminho,
-        formato: arquivoInfo.formato
+        formato: arquivoInfo.formato,
+        urlDownload: arquivoInfo.urlDownload
     };
 }
 
-export async function relatorioUsuariosEvento(idEvento) {
+export async function relatorioUsuariosEvento(idEvento, usuarioSolicitante = null) {
     if (!idEvento) {
         throw new Error("Identificador do evento não informado.");
     }
@@ -201,7 +207,7 @@ export async function relatorioUsuariosEvento(idEvento) {
     const eid = Number(idEvento);
 
     const eventoResultado = await executar(
-        `SELECT eventoId, nome, data, local FROM Evento WHERE eventoId = ?`,
+        `SELECT eventoId, nome, data, local, idOrganizador FROM Evento WHERE eventoId = ?`,
         [eid]
     );
 
@@ -211,7 +217,10 @@ export async function relatorioUsuariosEvento(idEvento) {
 
     const evento = eventoResultado[0];
 
-    // Busca de inscritos no evento usando a tabela oficial Inscricao
+    if (usuarioSolicitante && !usuarioSolicitante.adm && Number(evento.idOrganizador) !== Number(usuarioSolicitante.usuarioId)) {
+        throw new Error("Acesso não autorizado: apenas o organizador responsável pelo evento pode gerar este relatório.");
+    }
+
     const inscritos = await executar(
         `SELECT u.usuarioId, u.nome, u.matricula, u.siape, u.email,
                 i.presente, i.dataInscricao
@@ -280,6 +289,7 @@ export async function relatorioUsuariosEvento(idEvento) {
         totalInscritos: inscritos.length,
         inscritos,
         arquivo: arquivoInfo.caminho,
-        formato: arquivoInfo.formato
+        formato: arquivoInfo.formato,
+        urlDownload: arquivoInfo.urlDownload
     };
 }

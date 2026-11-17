@@ -200,9 +200,37 @@ button {
     cursor: pointer
 }
 
-.botao-entrar:hover,
-.botao-cadastrar:hover {
+.botao-entrar:hover:not(:disabled),
+.botao-cadastrar:hover:not(:disabled) {
     background: #12552b
+}
+
+.botao-cadastrar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.feedback-mensagem {
+    display: none;
+    padding: 11px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 18px;
+}
+
+.feedback-mensagem.erro {
+    display: block;
+    background: #fdecec;
+    color: #9b1c1c;
+    border: 1px solid #f5bcbc;
+}
+
+.feedback-mensagem.sucesso {
+    display: block;
+    background: #eaf7ee;
+    color: #166534;
+    border: 1px solid #b7e4c7;
 }
 
 .ou {

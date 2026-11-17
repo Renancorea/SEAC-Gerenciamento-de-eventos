@@ -46,7 +46,7 @@ export async function RelatorioUsuariosEvento(requisicao, resposta) {
             });
         }
 
-        const relatorio = await relatorioUsuariosEvento(idEvento);
+        const relatorio = await relatorioUsuariosEvento(idEvento, requisicao.usuario);
 
         return resposta.status(200).json({
             mensagem: "Relatório de usuários do evento gerado com sucesso",
@@ -54,7 +54,7 @@ export async function RelatorioUsuariosEvento(requisicao, resposta) {
         });
 
     } catch (erro) {
-        const status = erro.message.includes("não encontrado") ? 404 : 400;
+        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
         return resposta.status(status).json({
             mensagem: erro.message
         });

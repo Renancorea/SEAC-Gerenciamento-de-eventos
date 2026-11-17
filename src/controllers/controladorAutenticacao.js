@@ -35,3 +35,10 @@ export async function Logout(requisicao, resposta) {
         });
     }
 }
+
+export async function SessaoAtual(requisicao, resposta) {
+    return resposta.status(200).json({
+        mensagem: "Sessão ativa",
+        usuario: requisicao.usuario
+    });
+}

@@ -5,12 +5,17 @@ import {
     deletarEvento,
     editarEvento,
     listarDetalhesEvento,
-    listarEventos
+    listarEventos,
+    salvarImagemEvento,
+    listarImagensEvento
 } from "../services/servicoEvento.js";
 
 export async function CadastrarEvento(requisicao, resposta) {
     try {
-        const evento = await cadastrarEvento(requisicao.body);
+        const evento = await cadastrarEvento({
+            ...requisicao.body,
+            idOrganizador: requisicao.usuario.usuarioId
+        });
 
         return resposta.status(201).json({
             mensagem: "Evento cadastrado com sucesso",
@@ -26,17 +31,9 @@ export async function CadastrarEvento(requisicao, resposta) {
 
 export async function ListarEventos(requisicao, resposta) {
     try {
-        // Se houver parâmetro de pesquisa na rota principal
-        if (requisicao.query.pesquisa) {
-            const eventos = await pesquisarEventos(requisicao.query.pesquisa);
-            return resposta.status(200).json({
-                mensagem: "Eventos listados com sucesso",
-                eventos
-            });
-        }
+        const { pesquisa, tipo, categoria, data, cargaHoraria } = requisicao.query;
 
-        // Se houver filtros de categoria, tipo, data ou cargaHoraria
-        if (requisicao.query.tipo || requisicao.query.categoria || requisicao.query.data || requisicao.query.cargaHoraria) {
+        if (pesquisa || tipo || categoria || data || cargaHoraria) {
             const eventos = await filtrarEventos(requisicao.query);
             return resposta.status(200).json({
                 mensagem: "Eventos listados com sucesso",
@@ -79,9 +76,10 @@ export async function ListarDetalhesEventos(requisicao, resposta) {
 export async function EditarEvento(requisicao, resposta) {
     try {
         const idEvento = Number(requisicao.params.id);
-        const idOrganizador = Number(requisicao.body.idOrganizador || requisicao.query.idOrganizador);
+        const idOrganizador = requisicao.usuario.usuarioId;
+        const isAdmin = Boolean(requisicao.usuario.adm);
 
-        const eventoEditado = await editarEvento(idEvento, idOrganizador, requisicao.body);
+        const eventoEditado = await editarEvento(idEvento, idOrganizador, requisicao.body, isAdmin);
 
         return resposta.status(200).json({
             mensagem: "Evento editado com sucesso",
@@ -99,9 +97,10 @@ export async function EditarEvento(requisicao, resposta) {
 export async function DeletarEvento(requisicao, resposta) {
     try {
         const idEvento = Number(requisicao.params.id);
-        const idOrganizador = Number(requisicao.body.idOrganizador || requisicao.query.idOrganizador);
+        const idOrganizador = requisicao.usuario.usuarioId;
+        const isAdmin = Boolean(requisicao.usuario.adm);
 
-        await deletarEvento(idEvento, idOrganizador);
+        await deletarEvento(idEvento, idOrganizador, isAdmin);
 
         return resposta.status(200).json({
             mensagem: "Evento deletado com sucesso"
@@ -141,6 +140,43 @@ export async function FiltrarEventos(requisicao, resposta) {
             eventosFiltrados
         });
 
+    } catch (erro) {
+        return resposta.status(400).json({
+            mensagem: erro.message
+        });
+    }
+}
+
+export async function UploadImagemEvento(requisicao, resposta) {
+    try {
+        const idEvento = Number(requisicao.params.id);
+        const imagem = await salvarImagemEvento(
+            idEvento,
+            requisicao.usuario.usuarioId,
+            requisicao.body,
+            Boolean(requisicao.usuario.adm)
+        );
+
+        return resposta.status(201).json({
+            mensagem: "Imagem enviada com sucesso",
+            imagem
+        });
+    } catch (erro) {
+        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        return resposta.status(status).json({
+            mensagem: erro.message
+        });
+    }
+}
+
+export async function ListarImagensEvento(requisicao, resposta) {
+    try {
+        const idEvento = Number(requisicao.params.id);
+        const imagens = await listarImagensEvento(idEvento);
+        return resposta.status(200).json({
+            mensagem: "Imagens listadas com sucesso",
+            imagens
+        });
     } catch (erro) {
         return resposta.status(400).json({
             mensagem: erro.message

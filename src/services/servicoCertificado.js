@@ -3,20 +3,32 @@ import path from "path";
 import puppeteer from "puppeteer";
 import { executar } from "../db/conexao.js";
 
-export async function gerarCertificado(dados) {
-    const {
-        usuarioId,
-        eventoId
-    } = dados;
+export async function gerarCertificado(dados, usuarioSolicitante = null) {
+    const uid = Number(dados.usuarioId || usuarioSolicitante?.usuarioId);
+    const eid = Number(dados.eventoId);
 
-    if (!usuarioId || !eventoId) {
+    if (!uid || !eid) {
         throw new Error("Usuário e evento são obrigatórios para a emissão do certificado.");
     }
 
-    const uid = Number(usuarioId);
-    const eid = Number(eventoId);
+    if (usuarioSolicitante) {
+        const ehProprioUsuario = uid === Number(usuarioSolicitante.usuarioId);
+        const ehOrganizador = Number(usuarioSolicitante.tipo) === 0;
+        const ehAdmin = ehOrganizador && Boolean(usuarioSolicitante.adm);
 
-    // Validação da inscrição e presença usando a tabela oficial Inscricao
+        if (!ehProprioUsuario && !ehOrganizador) {
+            throw new Error("Acesso não autorizado: você não pode emitir certificados de outro usuário.");
+        }
+
+        if (ehOrganizador && !ehAdmin && !ehProprioUsuario) {
+            const evRes = await executar("SELECT idOrganizador FROM Evento WHERE eventoId = ?", [eid]);
+            if (evRes.length === 0) throw new Error("Evento não encontrado.");
+            if (Number(evRes[0].idOrganizador) !== Number(usuarioSolicitante.usuarioId)) {
+                throw new Error("Acesso não autorizado: apenas o organizador do evento pode emitir certificados para seus participantes.");
+            }
+        }
+    }
+
     const inscricaoResultado = await executar(
         `SELECT
             u.usuarioId,
@@ -36,7 +48,6 @@ export async function gerarCertificado(dados) {
     );
 
     if (inscricaoResultado.length === 0) {
-        // Verifica se o usuário ou evento existem para mensagem precisa
         const userExists = await executar("SELECT usuarioId FROM Usuario WHERE usuarioId = ?", [uid]);
         if (userExists.length === 0) throw new Error("Usuário não encontrado.");
 
@@ -48,12 +59,10 @@ export async function gerarCertificado(dados) {
 
     const dadosEvento = inscricaoResultado[0];
 
-    // Verificação de confirmação de presença (presente = true)
     if (!dadosEvento.presente) {
         throw new Error("Usuário não possui presença confirmada neste evento para emissão de certificado.");
     }
 
-    // Impedimento de duplicidade na emissão com base na restrição UNIQUE (usuarioId, eventoId)
     const certificadoExistente = await executar(
         `SELECT *
          FROM Certificado
@@ -62,7 +71,21 @@ export async function gerarCertificado(dados) {
     );
 
     if (certificadoExistente.length > 0) {
-        throw new Error("O certificado para este participante já foi emitido.");
+        const existente = certificadoExistente[0];
+        return {
+            certificadoId: existente.certificadoId,
+            codigo: path.basename(existente.arquivo, path.extname(existente.arquivo)),
+            usuarioId: uid,
+            eventoId: eid,
+            nomeParticipante: dadosEvento.nomeParticipante,
+            nomeEvento: dadosEvento.nomeEvento,
+            dataEvento: dadosEvento.dataEvento,
+            cargaHoraria: existente.cargaHoraria,
+            formato: path.extname(existente.arquivo).replace(".", "") || "html",
+            caminho: existente.arquivo,
+            urlDownload: `/certificados/${path.basename(existente.arquivo)}`,
+            jaExistia: true
+        };
     }
 
     const codigo = `SEAC-${Date.now()}`;
@@ -159,7 +182,6 @@ export async function gerarCertificado(dados) {
         </html>
     `;
 
-    // Garante que o diretório ./certificados exista
     const pastaCertificados = path.resolve("./certificados");
     if (!fs.existsSync(pastaCertificados)) {
         fs.mkdirSync(pastaCertificados, { recursive: true });
@@ -168,7 +190,6 @@ export async function gerarCertificado(dados) {
     let caminhoArquivo = path.join(pastaCertificados, `${codigo}.pdf`);
     let formatoArquivo = "pdf";
 
-    // Tentativa de geração com Puppeteer (com flags seguras de sandbox e timeout rápido de 2s)
     try {
         const gerarPdf = async () => {
             const browser = await puppeteer.launch({
@@ -206,8 +227,7 @@ export async function gerarCertificado(dados) {
         fs.writeFileSync(caminhoArquivo, html, "utf-8");
     }
 
-    // Registro do certificado no banco de dados respeitando a tabela Certificado
-    await executar(
+    const insertRes = await executar(
         `INSERT INTO Certificado
          (cargaHoraria, arquivo, dataEmissao, usuarioId, eventoId)
          VALUES (?, ?, ?, ?, ?)`,
@@ -221,6 +241,7 @@ export async function gerarCertificado(dados) {
     );
 
     return {
+        certificadoId: insertRes.insertId,
         codigo,
         usuarioId: uid,
         eventoId: eid,
@@ -231,6 +252,37 @@ export async function gerarCertificado(dados) {
         cargaHoraria: dadosEvento.cargaHoraria,
         formato: formatoArquivo,
         caminho: caminhoArquivo,
-        urlDownload: `/certificados/${path.basename(caminhoArquivo)}`
+        urlDownload: `/certificados/${path.basename(caminhoArquivo)}`,
+        jaExistia: false
     };
+}
+
+export async function listarCertificadosUsuario(usuarioId) {
+    const uid = Number(usuarioId);
+    if (!uid) {
+        throw new Error("Identificador do usuário não informado.");
+    }
+
+    const lista = await executar(
+        `SELECT c.certificadoId, c.cargaHoraria, c.arquivo, c.dataEmissao, c.usuarioId, c.eventoId,
+                e.nome AS nomeEvento, e.data AS dataEvento, e.local AS localEvento
+         FROM Certificado c
+         INNER JOIN Evento e ON c.eventoId = e.eventoId
+         WHERE c.usuarioId = ?`,
+        [uid]
+    );
+
+    return lista.map(c => ({
+        certificadoId: c.certificadoId,
+        codigo: path.basename(c.arquivo, path.extname(c.arquivo)),
+        cargaHoraria: c.cargaHoraria,
+        dataEmissao: c.dataEmissao,
+        usuarioId: c.usuarioId,
+        eventoId: c.eventoId,
+        nomeEvento: c.nomeEvento,
+        dataEvento: c.dataEvento,
+        localEvento: c.localEvento,
+        formato: path.extname(c.arquivo).replace(".", "") || "html",
+        urlDownload: `/certificados/${path.basename(c.arquivo)}`
+    }));
 }
