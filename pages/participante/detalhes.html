@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEAC - Detalhes do Evento</title>
+    <link rel="icon" href="../imagens/LOGO.png">
+    <link rel="stylesheet" href="detalhes.css">
+</head>
+
+<body data-tipo="participante">
+    <header class="topo"><a href="./" class="marca"><img src="../imagens/SE AC.png" alt="SEAC"></a></header>
+    <section class="capa">
+        <div class="capa-interna"><a class="voltar" href="./">‹ Voltar ao menu</a>
+            <div class="titulo-capa">
+                <div>
+                    <h1 id="nomeEvento">Nome do Evento</h1>
+                    <p id="nomeOrganizador">Nome do Organizador</p>
+                </div><span class="tipo" id="tipoEvento">Tipo</span>
+            </div>
+        </div>
+    </section>
+    <main class="conteudo">
+        <div class="coluna-principal">
+            <div class="resumo">
+                <article class="info"><span class="icone">▦</span><strong>DATA</strong>
+                    <p id="dataEvento">10/10/2026</p>
+                </article>
+                <article class="info"><span class="icone">◷</span><strong>HORÁRIO</strong>
+                    <p id="horarioEvento">16:20</p>
+                </article>
+                <article class="info"><span class="icone">♧</span><strong>LOCAL</strong>
+                    <p id="localEvento">Auditório Principal</p>
+                </article>
+            </div>
+            <section class="secao sobre">
+                <h2>Sobre o Evento</h2>
+                <p id="descricaoEvento">Texto de exemplo: A Semana Acadêmica de Administração é o maior evento do curso,
+                    reunindo palestrantes do mercado corporativo, empreendedores e docentes da área. Programação inclui
+                    talks sobre empreendedorismo, gestão de pessoas, marketing digital, finanças corporativas e
+                    responsabilidade social empresarial. Atividade extracurricular reconhecida pela coordenação do
+                    curso. Certificado de 40 horas para participantes que cumprirem o mínimo de 75% de presença.</p>
+            </section>
+            <section class="secao materiais">
+                <h2>Arquivos e Materiais</h2><a class="arquivo" href="#" id="baixarMaterial"><span
+                        class="arquivo-icone">▤</span><span><b>Nome do arquivo - Exemplo: Edital do Evento</b><small>17
+                            MB · Material informativo</small></span><span class="download">⇩</span></a>
+            </section>
+            <section class="secao comentarios">
+                <h2>Comentários</h2>
+                <form id="formComentario"><textarea id="textoComentario"
+                        placeholder="Faça uma sugestão ou comentário..." required maxlength="500"></textarea>
+                    <div class="acoes-comentario"><small id="avisoComentario" aria-live="polite"></small><button
+                            class="botao" type="submit">Enviar</button></div>
+                </form>
+                <div id="listaComentarios" class="lista-comentarios"></div>
+            </section>
+        </div>
+        <aside class="lateral">
+            <section class="cartao-inscricao" id="painelInscricao">
+                <div class="numeros"><span>Nº Inscritos<strong id="numeroInscritos">24</strong></span><span>Nº
+                        Vagas<strong id="numeroVagas">100</strong></span></div><button class="botao botao-inscrever"
+                    id="inscrever" type="button">Inscrever-se</button>
+                <p class="estado-inscricao" id="estadoInscricao" aria-live="polite"></p>
+            </section>
+            <section class="cartao">
+                <h3>Informações Rápidas</h3>
+                <dl>
+                    <div>
+                        <dt>Tipo</dt>
+                        <dd id="tipoRapido">Tipo</dd>
+                    </div>
+                    <div>
+                        <dt>Carga Horária</dt>
+                        <dd>10h</dd>
+                    </div>
+                    <div>
+                        <dt>Certificado</dt>
+                        <dd>Digital</dd>
+                    </div>
+                    <div>
+                        <dt>Modalidade</dt>
+                        <dd>Presencial</dd>
+                    </div>
+                </dl>
+            </section>
+            <section class="cartao atividades">
+                <h3>Atividades</h3>
+                <ul>
+                    <li>Nome da atividade - 08:00</li>
+                    <li>Nome da atividade - 10:00</li>
+                    <li>Nome da atividade - 13:00</li>
+                    <li>Nome da atividade - 15:00</li>
+                </ul>
+            </section>
+        </aside>
+        <div class="editar-area" id="areaEditar"><button class="botao" id="editarEvento" type="button">Editar</button>
+        </div>
+    </main>
+    <footer class="rodape">
+        <div class="rodape-marca">
+            <div class="logo-rodape"><img src="../imagens/LOGO.png" alt=""><strong>SEAC</strong></div>
+            <p>Plataforma oficial de eventos<br>científicos e acadêmicos do<br>Instituto Federal Campus Cedro</p>
+        </div>
+        <div class="rodape-coluna">
+            <h3>NAVEGAÇÃO</h3><a href="./">Catálogo de eventos</a><a href="../login/">Entrar</a><a
+                href="../cadastro/">Criar conta</a>
+        </div>
+        <div class="rodape-coluna">
+            <h3>DESENVOLVEDORES</h3><span>Renan</span><span>Lucca</span><span>Felipe</span><span>Samaya</span>
+        </div>
+        <div class="linha-rodape"></div>
+    </footer>
+    <div class="modal" id="modalEdicao" aria-hidden="true">
+        <form class="modal-conteudo" id="formEdicao"><button class="fechar" type="button" id="fecharModal"
+                aria-label="Fechar">×</button>
+            <h2>Editar evento</h2><label>Nome do evento<input id="editarNome" required></label><label>Nome do
+                organizador<input id="editarOrganizador" required></label><label>Tipo<input id="editarTipo"
+                    required></label><label>Data<input id="editarData" placeholder="10/10/2026"
+                    required></label><label>Horário<input id="editarHorario" placeholder="16:20"
+                    required></label><label>Local<input id="editarLocal" required></label><label>Descrição<textarea
+                    id="editarDescricao" required></textarea></label><button class="botao" type="submit">Salvar
+                alterações</button>
+        </form>
+    </div>
+    <script src="detalhes.js"></script>
+</body>
+
+</html>

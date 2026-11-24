@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEAC - Área do Organizador</title>
+  <link rel="icon" type="image/png" href="../imagens/LOGO.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header class="cabecalho">
+    <a href="../inicio/" class="marca" aria-label="Página inicial SEAC"><img src="../imagens/SE AC.png" alt="SEAC"></a>
+    <div class="busca"><span class="icone-busca">⌕</span><input id="campoBusca" type="search"
+        placeholder="Buscar eventos ou organizadores..." autocomplete="off"></div>
+    <div class="perfil"><span><strong id="nomeUsuario">Nome</strong><small>Organizador</small></span><button id="sair"
+        type="button" title="Sair">↪</button></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="decoracao circulo-hero-1"></div>
+      <div class="decoracao circulo-hero-2"></div>
+      <div class="decoracao circulo-hero-3"></div>
+      <div class="hero-texto">
+        <h1>SEAC</h1>
+        <h2>Sistema de Eventos<br>Acadêmicos e Científicos</h2>
+        <div class="hero-botoes"><a href="#eventos" class="botao-principal">Ver Eventos</a><a class="botao-secundario"
+            href="#" data-em-breve>Criar Evento</a></div>
+      </div>
+      <img class="logo-inicio" src="../imagens/LOGO.png" alt="Logo SEAC">
+    </section>
+    <section class="catalogo" id="eventos">
+      <div class="cabecalho-catalogo">
+        <div>
+          <h2>Meus Eventos</h2>
+          <p id="contadorEventos">4 Eventos encontrados</p>
+        </div>
+        <div class="filtros"><select id="filtroTipo" aria-label="Filtrar por tipo">
+            <option value="todos">Todos os tipos</option>
+            <option value="cientifico">Científico</option>
+            <option value="academico">Acadêmico</option>
+            <option value="cultural">Cultural</option>
+          </select><select id="ordenacao" aria-label="Ordenar eventos">
+            <option value="padrao">Ordenar por Data</option>
+            <option value="asc">Data mais próxima</option>
+            <option value="desc">Data mais distante</option>
+          </select></div>
+      </div>
+      <div class="grade-eventos" id="gradeEventos">
+        <article class="evento-card" data-evento-id="evento-seac-01" tabindex="0" role="link"
+          aria-label="Abrir detalhes do evento">
+          <div class="imagem-evento floresta-1">
+            <span class="etiqueta-tipo">Cientifico</span>
+            <span class="data-evento"><strong>23</strong><small>Set</small></span>
+          </div>
+          <div class="conteudo-evento">
+            <h3>Nome do evento</h3>
+            <p class="organizador">Nome do organizador</p>
+            <span class="local-evento"><img src="../imagens/localização.png" alt=""> Local</span>
+            <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+          </div>
+        </article>
+        <article class="evento-card" data-evento-id="evento-seac-02" tabindex="0" role="link"
+          aria-label="Abrir detalhes do evento">
+          <div class="imagem-evento floresta-2">
+            <span class="etiqueta-tipo">Academico</span>
+            <span class="data-evento"><strong>25</strong><small>Set</small></span>
+          </div>
+          <div class="conteudo-evento">
+            <h3>Nome do evento</h3>
+            <p class="organizador">Nome do organizador</p>
+            <span class="local-evento"><img src="../imagens/localização.png" alt=""> Local</span>
+            <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+          </div>
+        </article>
+        <article class="evento-card" data-evento-id="evento-seac-03" tabindex="0" role="link"
+          aria-label="Abrir detalhes do evento">
+          <div class="imagem-evento floresta-3">
+            <span class="etiqueta-tipo">Cultural</span>
+            <span class="data-evento"><strong>27</strong><small>Set</small></span>
+          </div>
+          <div class="conteudo-evento">
+            <h3>Nome do evento</h3>
+            <p class="organizador">Nome do organizador</p>
+            <span class="local-evento"><img src="../imagens/localização.png" alt=""> Local</span>
+            <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+          </div>
+        </article>
+        <article class="evento-card" data-evento-id="evento-seac-04" tabindex="0" role="link"
+          aria-label="Abrir detalhes do evento">
+          <div class="imagem-evento floresta-4">
+            <span class="etiqueta-tipo">Cientifico</span>
+            <span class="data-evento"><strong>30</strong><small>Set</small></span>
+          </div>
+          <div class="conteudo-evento">
+            <h3>Nome do evento</h3>
+            <p class="organizador">Nome do organizador</p>
+            <span class="local-evento"><img src="../imagens/localização.png" alt=""> Local</span>
+            <div class="dados-evento"><span>Nº de inscritos</span><span>Vagas</span></div>
+          </div>
+        </article>
+      </div>
+      <p class="sem-resultados" id="semResultados">Nenhum evento encontrado.</p>
+    </section>
+  </main>
+  <footer class="rodape">
+    <div class="rodape-marca">
+      <div class="logo-rodape"><img src="../imagens/LOGO.png" alt="SEAC"><strong>SEAC</strong></div>
+      <p>Plataforma de eventos<br>científicos e acadêmicos do<br>Instituto Federal Campus Cedro</p>
+    </div>
+    <div class="rodape-coluna">
+      <h3>NAVEGAÇÃO</h3><a href="#eventos">Meus Eventos</a><a href="../inicio/">Página inicial</a><a href="#"
+        id="linkSair">Sair da conta</a>
+    </div>
+    <div class="rodape-coluna">
+      <h3>DESENVOLVEDORES</h3><span>Renan</span><span>Lucca</span><span>Felipe</span><span>Samaya</span>
+    </div>
+    <div class="linha-rodape"></div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+
+</html>

@@ -37,7 +37,7 @@ app.use("/api/acoes", rotaAcao);
 
 // Rotas amigáveis das páginas existentes (preservando os nomes reais dos arquivos)
 app.get("/", (requisicao, resposta) => {
-    resposta.redirect("/inicio/");
+    resposta.redirect("/pages/");
 });
 app.get(["/inicio", "/inicio/"], (requisicao, resposta) => {
     resposta.sendFile(path.join(__dirname, "../pages/inicio/inicio.html"));

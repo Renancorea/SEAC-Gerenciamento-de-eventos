@@ -1,0 +1,150 @@
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--verde-escuro:#0b3a1d;--verde-header:#061d10;--verde:#78b82a;--verde-claro:#b0ca79;--fundo:#f3f1e4;--texto:#102d19}
+html{scroll-behavior:smooth}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--fundo);color:var(--texto);min-width:320px}
+a{color:inherit}
+.cabecalho{width:100%;min-height:64px;padding:0 6vw;background:var(--verde-header);display:flex;align-items:center;gap:28px;color:#fff}
+.marca{width:48px;height:48px;display:flex;align-items:center;flex-shrink:0}
+.marca img{width:42px;height:42px;object-fit:contain}
+.busca{flex:1;max-width:680px;height:34px;background:#315d34;border-radius:20px;display:flex;align-items:center;padding:0 14px}
+.icone-busca{color:#c1d596;font-size:20px;line-height:1}
+.busca input{width:100%;border:0;outline:0;background:transparent;color:#fff;font-size:14px;padding-left:8px}
+.busca input::placeholder{color:#d2dec2}
+.perfil{margin-left:auto;display:flex;align-items:center;gap:9px;color:#e8f0e3;font-size:12px}
+.perfil span{display:flex;flex-direction:column}
+.perfil small{font-size:9px;color:#b0ca79}
+.perfil button{border:1px solid #78b82a;background:transparent;color:#78b82a;border-radius:50%;width:28px;height:28px;cursor:pointer}
+.hero{width:100%;min-height:190px;position:relative;overflow:hidden;background:var(--verde-escuro);display:flex;align-items:center;padding:35px 8vw}
+.decoracao{position:absolute;border-radius:50%;background:rgba(74,133,43,.28)}
+.circulo-hero-1{width:150px;height:150px;left:-62px;top:45px}
+.circulo-hero-2{width:115px;height:115px;right:30%;top:32px}
+.circulo-hero-3{width:78px;height:78px;right:3%;bottom:12px}
+.hero-texto{position:relative;z-index:2;max-width:560px}
+.hero h1{font-family:'Lilita One',Georgia,serif;font-size:clamp(38px,4vw,58px);line-height:.9;color:#f8f6e8;letter-spacing:1px}
+.hero h2{font-family:Georgia,'Times New Roman',serif;color:var(--verde-claro);font-size:clamp(16px,1.7vw,23px);line-height:1.1;margin-top:5px}
+.hero-botoes{display:flex;gap:8px;margin-top:14px}
+.hero-botoes a{font-size:10px;text-decoration:none;padding:7px 13px;border-radius:20px;transition:.2s}
+.botao-principal{background:var(--verde);color:white}
+.botao-principal:hover{background:#669f21}
+.botao-secundario{border:1px solid #78a936;color:#a4c965}
+.botao-secundario:hover{background:rgba(120,184,42,.12)}
+.catalogo{width:100%;padding:26px 8vw 32px}
+.cabecalho-catalogo{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:16px}
+.cabecalho-catalogo h2{font-family:Georgia,'Times New Roman',serif;font-size:18px}
+.cabecalho-catalogo p{font-size:10px;color:#555;margin-top:3px}
+.filtros{display:flex;gap:8px}
+.filtros select{appearance:none;border:1px solid #8b9a8b;background:var(--fundo);border-radius:18px;padding:6px 10px;font-size:9px;color:#34543b;cursor:pointer}
+.grade-eventos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.evento-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 3px 12px #00000012;min-width:0;cursor:pointer}
+.imagem-evento{position:relative;width:100%;height:88px;background-size:cover;background-position:center;overflow:hidden}
+.floresta-1,.floresta-2,.floresta-3,.floresta-4{background-image:url("../imagens/floresta.png")}
+.etiqueta-tipo{position:absolute;top:5px;right:5px;padding:2px 6px;border:1px solid white;border-radius:12px;background:#0006;color:white;font-size:8px}
+.data-evento{position:absolute;top:5px;left:5px;width:26px;height:30px;background:white;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#17251c;box-shadow:0 2px 5px #0003}
+.data-evento strong{font-size:11px;line-height:12px}.data-evento small{font-size:8px}
+.conteudo-evento{padding:7px 7px 8px}
+.conteudo-evento h3{font-family:Georgia,'Times New Roman',serif;font-size:11px}
+.organizador{font-size:8px;color:#555;margin-top:2px}
+.local-evento{display:flex;align-items:center;gap:4px;font-size:8px;margin-top:5px;color:#637065}
+.local-evento img{width:10px;height:10px;object-fit:contain}
+.dados-evento{display:flex;justify-content:space-between;color:#78965d;font-size:7px;margin-top:5px}
+.sem-resultados{display:none;text-align:center;padding:30px 0;color:#69736b;font-size:13px}
+.rodape{width:100%;min-height:105px;background:var(--verde-escuro);color:#e6eadf;padding:20px 8vw 35px;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:35px;position:relative}
+.logo-rodape{display:flex;align-items:center;gap:8px}.logo-rodape img{width:28px;height:28px;object-fit:contain}.logo-rodape strong{font-family:Georgia,serif;font-size:18px}
+.rodape-marca p{font-size:8px;line-height:1.35;color:#cbd5c6;margin-top:6px}
+.rodape-coluna{display:flex;flex-direction:column;gap:3px}.rodape-coluna h3{font-size:8px;font-weight:normal;margin-bottom:4px;color:#bfcdb9}.rodape-coluna a,.rodape-coluna span{text-decoration:none;font-size:8px;color:#d8ded4}
+.linha-rodape{position:absolute;height:1px;background:#ffffff4d;left:4vw;right:4vw;bottom:15px}
+@media(max-width:750px){.cabecalho{padding:8px 4vw;gap:12px}.busca{max-width:none}.hero{padding:30px 6vw;min-height:210px}.capelo{right:-15px;opacity:.6;transform:scale(.75) rotate(8deg)}.hero-texto{max-width:75%}.grade-eventos{grid-template-columns:repeat(2,minmax(0,1fr))}.catalogo{padding:25px 5vw}.cabecalho-catalogo{align-items:flex-start;flex-direction:column}.filtros{width:100%}.filtros select{flex:1}.rodape{grid-template-columns:1fr 1fr;gap:20px}}
+@media(max-width:480px){.busca{display:none}.hero-texto{max-width:100%}.capelo{right:-65px;top:90px}.hero h1{font-size:42px}.hero h2{font-size:17px}.grade-eventos{grid-template-columns:1fr}.rodape{grid-template-columns:1fr}}
+
+
+/* Ajustes de tamanho das telas de participante e organizador */
+.cabecalho { min-height: 72px; padding-left: 6vw; padding-right: 6vw; gap: 32px; }
+.marca, .marca img { width: 50px; height: 50px; }
+.busca { height: 38px; }
+.perfil { font-size: 14px; }
+.perfil small { font-size: 11px; }
+.hero { min-height: 340px; padding: 55px 8vw; }
+.hero-texto { max-width: 620px; }
+.hero h1 { font-size: clamp(58px, 6vw, 82px); line-height: .9; }
+.hero h2 { font-size: clamp(24px, 2.5vw, 34px); line-height: 1.12; margin-top: 12px; }
+.hero-botoes { gap: 12px; margin-top: 24px; }
+.hero-botoes a { font-size: 14px; padding: 10px 20px; }
+.circulo-hero-1 { width: 220px; height: 220px; left: -90px; top: 45px; }
+.circulo-hero-2 { width: 170px; height: 170px; right: 25%; top: 50px; }
+.circulo-hero-3 { width: 120px; height: 120px; right: 5%; bottom: 30px; }
+.catalogo { padding: 50px 8vw 60px; }
+.cabecalho-catalogo { gap: 28px; margin-bottom: 24px; }
+.cabecalho-catalogo h2 { font-size: 28px; }
+.cabecalho-catalogo p { font-size: 13px; }
+.filtros { gap: 12px; }
+.filtros select { padding: 9px 28px 9px 14px; font-size: 12px; }
+.grade-eventos { gap: 22px; }
+.imagem-evento { height: 170px; }
+.etiqueta-tipo { top: 10px; right: 10px; padding: 3px 8px; font-size: 10px; }
+.data-evento { top: 10px; left: 10px; width: 36px; height: 40px; }
+.data-evento strong { font-size: 15px; line-height: 16px; }
+.data-evento small { font-size: 10px; }
+.conteudo-evento { padding: 15px 13px 14px; }
+.conteudo-evento h3 { font-size: 17px; }
+.organizador { font-size: 12px; margin-top: 4px; }
+.local-evento { font-size: 12px; margin-top: 8px; }
+.local-evento img { width: 14px; height: 14px; }
+.dados-evento { font-size: 10px; margin-top: 10px; }
+.rodape { min-height: 190px; padding: 38px 8vw 55px; gap: 55px; }
+.logo-rodape { gap: 12px; }
+.logo-rodape img { width: 44px; height: 44px; }
+.logo-rodape strong { font-size: 25px; }
+.rodape-marca p { font-size: 11px; margin-top: 10px; }
+.rodape-coluna { gap: 5px; }
+.rodape-coluna h3 { font-size: 11px; margin-bottom: 7px; }
+.rodape-coluna a, .rodape-coluna span { font-size: 11px; }
+.linha-rodape { left: 8vw; right: 8vw; bottom: 24px; }
+@media(max-width:750px) {
+  .cabecalho { padding: 10px 4vw; gap: 14px; }
+  .hero { min-height: 300px; padding: 40px 6vw; }
+  .hero h1 { font-size: 54px; }
+  .hero h2 { font-size: 23px; }
+  .hero-texto { max-width: 100%; }
+  .catalogo { padding: 35px 5vw 45px; }
+  .grade-eventos { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .imagem-evento { height: 150px; }
+  .rodape { padding: 35px 5vw 55px; gap: 24px; }
+}
+@media(max-width:480px) {
+  .hero { min-height: 280px; padding: 35px 20px; }
+  .hero h1 { font-size: 48px; }
+  .hero h2 { font-size: 21px; }
+  .grade-eventos { grid-template-columns: 1fr; }
+  .imagem-evento { height: 190px; }
+  .rodape { grid-template-columns: 1fr; }
+}
+
+
+/* ===== LOGO SEAC NA TELA INICIAL =====
+   Ajuste estes valores para mudar tamanho e posição da imagem. */
+:root {
+  --logo-inicio-largura: clamp(170px, 24vw, 330px);
+  --logo-inicio-direita: 8%;
+  --logo-inicio-topo: 50%;
+}
+.logo-inicio {
+  position: absolute;
+  z-index: 1;
+  width: var(--logo-inicio-largura);
+  height: auto;
+  max-height: 90%;
+  object-fit: contain;
+  right: var(--logo-inicio-direita);
+  top: var(--logo-inicio-topo);
+  transform: translateY(-50%);
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+  pointer-events: none;
+}
+@media (max-width: 750px) {
+  :root { --logo-inicio-largura: clamp(125px, 30vw, 205px); --logo-inicio-direita: 3%; --logo-inicio-topo: 58%; }
+  .hero-texto { max-width: 68%; }
+}
+@media (max-width: 480px) {
+  :root { --logo-inicio-largura: 118px; --logo-inicio-direita: 0%; --logo-inicio-topo: 67%; }
+  .hero-texto { max-width: 72%; }
+}

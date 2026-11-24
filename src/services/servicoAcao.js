@@ -1,19 +1,21 @@
 import { executar } from "../db/conexao.js";
 
+// verfica se usuario percence a evento
 async function verificarDonoEvento(eventoId, usuario) {
-    const res = await executar(
+    const resposta = await executar(
         `SELECT eventoId, idOrganizador FROM Evento WHERE eventoId = ?`,
         [Number(eventoId)]
     );
-    if (res.length === 0) {
+    if (resposta.length === 0) {
         throw new Error("Evento associado não foi encontrado.");
     }
-    if (usuario && !usuario.adm && Number(res[0].idOrganizador) !== Number(usuario.usuarioId)) {
+    // Apesar de que no front ele ja não vai acessar, segurança a mais
+    if (usuario && !usuario.adm && Number(resposta[0].idOrganizador) !== Number(usuario.usuarioId)) {
         throw new Error("Acesso não autorizado: apenas o organizador responsável pelo evento pode gerenciar suas ações.");
     }
-    return res[0];
+    return resposta[0];
 }
-
+// Apenas para colocar nos relatorios
 export async function cadastrarAcao(dados, usuario = null) {
     const { nome, eventoId } = dados;
 
@@ -21,21 +23,22 @@ export async function cadastrarAcao(dados, usuario = null) {
         throw new Error("Nome da ação e identificador do evento são obrigatórios.");
     }
 
-    const eid = Number(eventoId);
-    await verificarDonoEvento(eid, usuario);
+    const verifi = Number(eventoId);
+    await verificarDonoEvento(verifi, usuario);
 
+    // Só inserindo no banco
     const resultadoInsert = await executar(
         `INSERT INTO Acao (nome, eventoId) VALUES (?, ?)`,
-        [nome.trim(), eid]
+        [nome.trim(), verifi]
     );
 
     return {
         acaoId: resultadoInsert.insertId,
         nome: nome.trim(),
-        eventoId: eid
+        eventoId: verifi
     };
 }
-
+// Relatorios
 export async function listarAcoesPorEvento(eventoId) {
     if (!eventoId) {
         throw new Error("Identificador do evento não informado.");

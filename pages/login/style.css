@@ -28,9 +28,37 @@ body {
     height: auto;
 }
 
+.acoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 28px;
+    margin-left: auto;
+}
+
+.acoes .link-entrar {
+    background: transparent !important;
+    color: #78b82a !important;
+    padding: 0 !important;
+    border: none !important;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.acoes .botao-topo {
+    display: inline-block;
+    background: #78b82a !important;
+    color: #173b20 !important;
+    padding: 10px 24px !important;
+    border: none !important;
+    border-radius: 30px !important;
+    text-decoration: none;
+    font-weight: normal;
+}
+
 .botao-cadastro {
     background: #7caf32;
-    color: white;
+    color: #19381F;
 
     text-decoration: none;
 
@@ -132,20 +160,6 @@ body {
 
 
 
-.logo-ifce {
-    position: absolute;
-
-    bottom: 45px;
-    left: 8%;
-}
-
-.logo-ifce img {
-    width: 170px;
-    height: auto;
-}
-
-
-
 .lado-direito {
     background: #f9faf6;
 
@@ -182,26 +196,54 @@ body {
     margin-bottom: 28px;
 }
 
-
+/* SELETOR PARTICIPANTE / ORGANIZADOR */
 
 .tipos {
+    position: relative;
+
     display: flex;
 
     width: 100%;
+    height: 48px;
 
-    border: 1px solid #cfd5ce;
+    background: #eef1ed;
 
     border-radius: 25px;
 
-    padding: 3px;
+    padding: 4px;
 
     margin-bottom: 25px;
+
+    overflow: hidden;
+}
+
+.indicador {
+    position: absolute;
+
+    top: 4px;
+    left: 4px;
+
+    width: calc(50% - 4px);
+    height: 40px;
+
+    background: #123a27;
+
+    border-radius: 22px;
+
+    transition: transform 0.3s ease;
+
+    pointer-events: none;
+
+    z-index: 1;
 }
 
 .tipo {
-    width: 50%;
+    position: relative;
 
-    height: 42px;
+    z-index: 2;
+
+    width: 50%;
+    height: 40px;
 
     border: none;
 
@@ -209,21 +251,20 @@ body {
 
     border-radius: 22px;
 
+    color: #59615c;
+
     font-size: 14px;
+    font-weight: normal;
 
     cursor: pointer;
 
-    color: #59615c;
+    transition: color 0.3s ease;
 }
 
 .tipo.ativo {
-    background: #123a27;
-
     color: white;
-
     font-weight: bold;
 }
-
 
 
 label {
@@ -326,43 +367,8 @@ input:focus {
     cursor: pointer;
 }
 
-.botao-entrar:hover:not(:disabled) {
+.botao-entrar:hover {
     background: #1d6034;
-}
-
-.botao-entrar:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.feedback-mensagem {
-    display: none;
-    padding: 11px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    line-height: 1.4;
-    margin-bottom: 16px;
-}
-
-.feedback-mensagem.erro {
-    display: block;
-    background: #fdecec;
-    color: #9b1c1c;
-    border: 1px solid #f5bcbc;
-}
-
-.feedback-mensagem.sucesso {
-    display: block;
-    background: #eaf7ee;
-    color: #166534;
-    border: 1px solid #b7e4c7;
-}
-
-.feedback-mensagem.info {
-    display: block;
-    background: #eef5f0;
-    color: #123a27;
-    border: 1px solid #c5dccb;
 }
 
 
@@ -520,5 +526,35 @@ input:focus {
 
     .rodape {
         display: none;
+    }
+}
+/* ===== LOGO SEAC ABAIXO DA FRASE DO LOGIN ===== */
+
+.login-container {
+    position: relative;
+}
+
+.login-container::after {
+    content: "";
+    display: block;
+    width: 340px;
+    height: 220px;
+    margin: 25px auto 0;
+
+    background-image: url("../imagens/logo-seac-capelo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    opacity: 0.22;
+    pointer-events: none;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 600px) {
+    .login-container::after {
+        width: 250px;
+        height: 170px;
+        margin-top: 18px;
     }
 }

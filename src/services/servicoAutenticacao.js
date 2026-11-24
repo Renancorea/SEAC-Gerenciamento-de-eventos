@@ -2,7 +2,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { executar } from "../db/conexao.js";
 
-// Gerenciador de sessões ativas para autenticação coerente
+// Gerenciador de sessões
 const sessoesAtivas = new Map();
 
 export async function login(dados) {

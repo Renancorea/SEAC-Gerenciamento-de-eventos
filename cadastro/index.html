@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEAC - Criar Conta</title>
+    <link rel="icon" type="image/png" href="../imagens/LOGO.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="cabecalho">
+        <a class="marca" href="../inicio/" aria-label="Página inicial SEAC">
+            <img src="../imagens/SE AC.png" alt="Logo SEAC">
+        </a>
+        <nav class="navegacao" aria-label="Navegação principal">
+            <a class="link-entrar" href="../login/">Entrar</a>
+            <a class="link-cadastro" href="./">Cadastre-se</a>
+        </nav>
+    </header>
+
+    <main class="principal">
+        <section class="conteudo-cadastro" aria-labelledby="titulo-cadastro">
+            <div class="topo-formulario">
+                <div class="texto-titulo">
+                    <h1 id="titulo-cadastro">Criar Conta</h1>
+                    <p>Junte-se à comunidade SEAC :)</p>
+                </div>
+                <div class="acessos-sociais" aria-label="Opções de acesso">
+                    <span class="icone-social google" title="Google">
+                        <img src="../imagens/google.png" alt="Google">
+                    </span>
+                    <span class="icone-social suap" title="SUAP">
+                        <img src="../imagens/suap.ifrr.edu.br 1.png" alt="SUAP">
+                    </span>
+                </div>
+            </div>
+
+            <form class="card" id="formCadastro">
+                <fieldset class="grupo-tipo">
+                    <legend>TIPO DE USUÁRIO</legend>
+                    <div class="opcoes-tipo">
+                        <label class="opcao-tipo selecionada" for="participante">
+                            <input type="radio" id="participante" name="tipo" value="participante" checked>
+                            <span class="radio-visual" aria-hidden="true"></span>
+                            <span class="texto-opcao">
+                                <strong>Participante</strong>
+                                <span>Inscreva-se em eventos e<br class="quebra-desktop"> obtenha certificados</span>
+                            </span>
+                        </label>
+                        <label class="opcao-tipo" for="organizador">
+                            <input type="radio" id="organizador" name="tipo" value="organizador">
+                            <span class="radio-visual" aria-hidden="true"></span>
+                            <span class="texto-opcao">
+                                <strong>Organizador</strong>
+                                <span>Crie e gerencie eventos<br class="quebra-desktop"> acadêmicos</span>
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <div class="campo campo-nome">
+                    <label for="nome">NOME COMPLETO</label>
+                    <input type="text" id="nome" name="nome" autocomplete="name" required>
+                </div>
+
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="identificacao" id="rotulo-identificacao">MATRÍCULA</label>
+                        <input type="text" id="identificacao" name="identificacao" autocomplete="username" required>
+                    </div>
+                    <div class="campo">
+                        <label for="email">E - MAIL</label>
+                        <input type="email" id="email" name="email" autocomplete="email" required>
+                    </div>
+                    <div class="campo">
+                        <label for="senha">SENHA</label>
+                        <input type="password" id="senha" name="senha" autocomplete="new-password" required>
+                    </div>
+                    <div class="campo">
+                        <label for="confirmar">CONFIRMAR SENHA</label>
+                        <input type="password" id="confirmar" name="confirmar" autocomplete="new-password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="botao-cadastrar">Criar Conta</button>
+            </form>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

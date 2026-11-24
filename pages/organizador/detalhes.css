@@ -1,0 +1,812 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lilita+One&display=swap');
+
+:root {
+    --verde: #7eae32;
+    --escuro: #173b25;
+    --fundo: #f0efe1;
+    --texto: #29352b;
+    --branco: #fffefa
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: 'DM Sans', Arial, sans-serif
+}
+
+.topo {
+    height: 50px;
+    background: var(--escuro);
+    padding: 4px 5%;
+    display: flex;
+    align-items: center
+}
+
+.marca img {
+    width: 36px;
+    height: 42px;
+    object-fit: contain
+}
+
+.capa {
+    height: 300px;
+    background: linear-gradient(0deg, rgba(12, 49, 29, .88), rgba(0, 0, 0, .12)), url('../imagens/floresta.png') center 48%/cover no-repeat;
+    color: #fff
+}
+
+.capa-interna {
+    max-width: 745px;
+    height: 100%;
+    margin: auto;
+    position: relative;
+    padding-top: 20px
+}
+
+.voltar {
+    color: #dce5d1;
+    text-decoration: none;
+    font-size: 12px
+}
+
+.titulo-capa {
+    position: absolute;
+    bottom: 22px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.titulo-capa h1 {
+    font-family: 'Lilita One', Georgia, serif;
+    font-size: 36px;
+    line-height: 1.1;
+    margin: 0;
+    color: #fff
+}
+
+.titulo-capa p {
+    margin: 0;
+    color: #d7e2ce;
+    font-size: 13px
+}
+
+.tipo {
+    border: 1px solid #b9c9a9;
+    border-radius: 22px;
+    padding: 7px 32px;
+    font-size: 13px;
+    color: #e3ebd9
+}
+
+.conteudo {
+    max-width: 745px;
+    margin: 40px auto 42px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 215px;
+    gap: 30px 30px
+}
+
+.resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px
+}
+
+.info,
+.cartao-inscricao,
+.cartao,
+.arquivo,
+.comentario {
+    background: var(--branco);
+    border-radius: 12px
+}
+
+.info {
+    min-height: 100px;
+    padding: 12px
+}
+
+.icone {
+    display: block;
+    font-size: 25px;
+    line-height: 1.1;
+    color: #244431;
+    margin-bottom: 5px
+}
+
+.info strong {
+    display: block;
+    color: #8bad5e;
+    font-size: 14px;
+    margin-bottom: 7px
+}
+
+.info p {
+    margin: 0;
+    font-size: 14px;
+    white-space: normal
+}
+
+.secao {
+    margin-top: 40px
+}
+
+.secao h2 {
+    font: bold 22px Georgia, serif;
+    color: var(--escuro);
+    margin: 0 0 16px
+}
+
+.sobre p {
+    font-size: 14px;
+    line-height: 1.42;
+    margin: 0
+}
+
+.arquivo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--texto);
+    min-height: 60px
+}
+
+.arquivo-icone {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #eff2e4;
+    color: #83a94d;
+    display: grid;
+    place-items: center;
+    font-size: 22px
+}
+
+.arquivo b {
+    font-size: 13px;
+    font-weight: 500
+}
+
+.arquivo small {
+    display: block;
+    font-size: 10px;
+    color: #777
+}
+
+.download {
+    margin-left: auto;
+    color: #80a84a;
+    font-size: 25px
+}
+
+.comentarios {
+    margin-top: 40px
+}
+
+.comentarios textarea {
+    width: 100%;
+    height: 86px;
+    resize: vertical;
+    border: 1px solid #b8c99c;
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: #fffefa;
+    font: 14px 'DM Sans', sans-serif;
+    outline-color: var(--verde)
+}
+
+.comentarios textarea::placeholder {
+    color: #7d9568
+}
+
+.acoes-comentario {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    min-height: 34px
+}
+
+.botao {
+    border: 0;
+    border-radius: 22px;
+    background: var(--verde);
+    color: #18351e;
+    padding: 9px 26px;
+    font: 500 14px 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: .2s
+}
+
+.botao:hover {
+    background: #6d9e25;
+    color: white
+}
+
+.lista-comentarios {
+    display: grid;
+    gap: 14px;
+    margin-top: 18px
+}
+
+.comentario {
+    padding: 16px 18px;
+    min-height: 94px
+}
+
+.comentario-topo {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px
+}
+
+.comentario-topo strong {
+    font-weight: 600
+}
+
+.comentario-topo time {
+    font-size: 12px;
+    color: #687168;
+    white-space: nowrap
+}
+
+.comentario p {
+    font-size: 14px;
+    line-height: 1.35;
+    margin: 5px 0 0
+}
+
+.lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 30px
+}
+
+.cartao-inscricao {
+    padding: 12px
+}
+
+.numeros {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    color: #6c6c65;
+    margin-bottom: 18px
+}
+
+.numeros span {
+    display: flex;
+    flex-direction: column;
+    gap: 5px
+}
+
+.numeros strong {
+    font-size: 16px;
+    color: #263c2b
+}
+
+.botao-inscrever {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 8px
+}
+
+.estado-inscricao {
+    font-size: 11px;
+    text-align: center;
+    color: #537b31;
+    margin: 7px 0 0
+}
+
+.cartao {
+    padding: 14px 13px
+}
+
+.cartao h3 {
+    text-align: center;
+    font-size: 15px;
+    margin: 0 0 16px;
+    color: #263c2b
+}
+
+.cartao dl {
+    margin: 0;
+    display: grid;
+    gap: 12px
+}
+
+.cartao dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 14px
+}
+
+.cartao dt {
+    color: #73736d
+}
+
+.cartao dd {
+    margin: 0;
+    text-align: right
+}
+
+.atividades ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 9px;
+    font-size: 14px;
+    color: #686861
+}
+
+.editar-area {
+    grid-column: 1/-1;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -8px
+}
+
+.editar-area .botao {
+    min-width: 80px
+}
+
+.rodape {
+    background: var(--escuro);
+    color: #e6eadf;
+    padding: 38px max(calc((100% - 745px)/2), 6%) 55px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 35px;
+    position: relative
+}
+
+.logo-rodape {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.logo-rodape img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain
+}
+
+.logo-rodape strong {
+    font: bold 25px Georgia, serif
+}
+
+.rodape-marca p {
+    font-size: 12px;
+    line-height: 1.3;
+    color: #cbd5c6;
+    margin-top: 10px
+}
+
+.rodape-coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 3px
+}
+
+.rodape-coluna h3 {
+    font-size: 11px;
+    font-weight: 500;
+    margin: 0 0 7px;
+    color: #bfcdb9
+}
+
+.rodape-coluna a,
+.rodape-coluna span {
+    text-decoration: none;
+    font-size: 11px;
+    color: #d8ded4
+}
+
+.linha-rodape {
+    position: absolute;
+    height: 1px;
+    background: #ffffff4d;
+    left: 3%;
+    right: 3%;
+    bottom: 24px
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: #0009;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 5
+}
+
+.modal.aberto {
+    display: flex
+}
+
+.modal-conteudo {
+    position: relative;
+    background: #fffefa;
+    border-radius: 14px;
+    padding: 25px;
+    width: min(520px, 100%);
+    max-height: 90vh;
+    overflow: auto;
+    display: grid;
+    gap: 12px
+}
+
+.modal-conteudo h2 {
+    font: bold 22px Georgia, serif;
+    color: var(--escuro);
+    margin: 0 0 5px
+}
+
+.modal-conteudo label {
+    display: grid;
+    gap: 5px;
+    font-size: 13px
+}
+
+.modal-conteudo input,
+.modal-conteudo textarea {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #c5cfb8;
+    border-radius: 7px;
+    font: 14px 'DM Sans', sans-serif
+}
+
+.modal-conteudo textarea {
+    min-height: 90px;
+    resize: vertical
+}
+
+.fechar {
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    border: 0;
+    background: none;
+    font-size: 26px;
+    cursor: pointer;
+    color: #415442
+}
+
+@media(max-width:800px) {
+    .capa-interna {
+        margin: 0 7%
+    }
+
+    .conteudo {
+        margin: 30px 7%;
+        grid-template-columns: minmax(0, 1fr) 200px;
+        gap: 22px
+    }
+
+    .resumo {
+        gap: 10px
+    }
+
+    .info {
+        padding: 10px
+    }
+
+    .rodape {
+        padding-left: 7%;
+        padding-right: 7%
+    }
+}
+
+@media(max-width:600px) {
+    .capa {
+        height: 260px
+    }
+
+    .titulo-capa h1 {
+        font-size: 29px
+    }
+
+    .conteudo {
+        display: flex;
+        flex-direction: column;
+        margin: 25px 5% 35px
+    }
+
+    .resumo {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px
+    }
+
+    .info {
+        min-height: 100px;
+        padding: 9px 7px
+    }
+
+    .info strong {
+        font-size: 11px
+    }
+
+    .info p {
+        font-size: 11px
+    }
+
+    .icone {
+        font-size: 22px
+    }
+
+    .lateral {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px
+    }
+
+    .cartao-inscricao {
+        grid-column: 1/-1
+    }
+
+    .cartao {
+        padding: 13px 10px
+    }
+
+    .cartao dl div,
+    .atividades ul {
+        font-size: 12px
+    }
+
+    .secao {
+        margin-top: 30px
+    }
+
+    .secao h2 {
+        font-size: 20px
+    }
+
+    .sobre p,
+    .comentario p {
+        font-size: 13px
+    }
+
+    .arquivo b {
+        font-size: 11px
+    }
+
+    .comentario {
+        padding: 13px
+    }
+
+    .comentario-topo {
+        font-size: 12px
+    }
+
+    .rodape {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        padding: 30px 6% 55px
+    }
+
+    .rodape-marca {
+        grid-column: 1/-1
+    }
+
+    .editar-area {
+        margin-top: 0
+    }
+}
+
+
+/* ===== AJUSTE DE TAMANHO: DETALHES DO EVENTO ===== */
+.capa-interna {
+    max-width: 1100px !important;
+    width: calc(100% - 64px) !important;
+}
+
+.conteudo {
+    max-width: 1100px !important;
+    width: calc(100% - 64px) !important;
+    grid-template-columns: minmax(0, 1fr) 290px !important;
+    gap: 30px !important;
+    margin: 40px auto 50px !important;
+}
+
+.titulo-capa h1 {
+    font-size: 44px !important;
+}
+
+.titulo-capa p {
+    font-size: 16px !important;
+}
+
+.voltar {
+    font-size: 14px !important;
+}
+
+.tipo {
+    font-size: 15px !important;
+    padding: 9px 30px !important;
+}
+
+.resumo {
+    gap: 16px !important;
+}
+
+.info {
+    min-height: 120px !important;
+    padding: 16px !important;
+}
+
+.icone {
+    font-size: 30px !important;
+}
+
+.info strong {
+    font-size: 16px !important;
+}
+
+.info p {
+    font-size: 16px !important;
+}
+
+.secao {
+    margin-top: 42px !important;
+}
+
+.secao h2 {
+    font-size: 26px !important;
+    margin-bottom: 18px !important;
+}
+
+.sobre p {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+}
+
+.arquivo {
+    min-height: 72px !important;
+    padding: 15px !important;
+    gap: 14px !important;
+}
+
+.arquivo b {
+    font-size: 15px !important;
+}
+
+.arquivo small {
+    font-size: 12px !important;
+}
+
+.comentarios textarea {
+    min-height: 105px !important;
+    font-size: 16px !important;
+}
+
+.comentario {
+    padding: 20px !important;
+    min-height: 105px !important;
+}
+
+.comentario-topo {
+    font-size: 16px !important;
+}
+
+.comentario p {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+}
+
+.lateral {
+    gap: 22px !important;
+}
+
+.cartao-inscricao {
+    padding: 18px !important;
+}
+
+.numeros {
+    font-size: 14px !important;
+}
+
+.numeros strong {
+    font-size: 19px !important;
+}
+
+.botao,
+.botao-inscrever {
+    font-size: 16px !important;
+    padding: 12px 22px !important;
+}
+
+.cartao {
+    padding: 19px !important;
+}
+
+.cartao h3 {
+    font-size: 18px !important;
+}
+
+.cartao dl div,
+.atividades ul {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+}
+
+.rodape {
+    padding-left: max(calc((100% - 1100px)/2), 32px) !important;
+    padding-right: max(calc((100% - 1100px)/2), 32px) !important;
+}
+
+@media (max-width: 800px) {
+    .capa-interna {
+        width: 90% !important;
+    }
+
+    .conteudo {
+        width: 90% !important;
+        grid-template-columns: 1fr !important;
+    }
+
+    .lateral {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .cartao-inscricao {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .capa-interna {
+        width: 92% !important;
+    }
+
+    .conteudo {
+        width: 92% !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .titulo-capa h1 {
+        font-size: 32px !important;
+    }
+
+    .info {
+        padding: 10px !important;
+        min-height: 105px !important;
+    }
+
+    .info strong,
+    .info p {
+        font-size: 12px !important;
+    }
+
+    .sobre p,
+    .comentario p {
+        font-size: 14px !important;
+    }
+
+    .lateral {
+        display: flex !important;
+    }
+
+    .rodape {
+        padding-left: 6% !important;
+        padding-right: 6% !important;
+    }
+}
