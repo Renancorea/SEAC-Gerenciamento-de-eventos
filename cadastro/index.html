@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEAC - Criar Conta</title>
-    <link rel="icon" type="image/png" href="../imagens/LOGO.png">
+    <link rel="icon" type="image/png" href="/assets/LOGO.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="cabecalho">
-        <a class="marca" href="../inicio/" aria-label="Página inicial SEAC">
-            <img src="../imagens/SE AC.png" alt="Logo SEAC">
+        <a class="marca" href="/inicio/" aria-label="Página inicial SEAC">
+            <img src="/assets/logoSeacTexto.png" alt="Logo SEAC">
         </a>
         <nav class="navegacao" aria-label="Navegação principal">
-            <a class="link-entrar" href="../login/">Entrar</a>
+            <a class="link-entrar" href="/login/">Entrar</a>
             <a class="link-cadastro" href="./">Cadastre-se</a>
         </nav>
     </header>
@@ -27,10 +27,10 @@
                 </div>
                 <div class="acessos-sociais" aria-label="Opções de acesso">
                     <span class="icone-social google" title="Google">
-                        <img src="../imagens/google.png" alt="Google">
+                        <img src="/assets/logoGoogle.png" alt="Google">
                     </span>
                     <span class="icone-social suap" title="SUAP">
-                        <img src="../imagens/suap.ifrr.edu.br 1.png" alt="SUAP">
+                        <img src="/assets/iconSuapTexto.png" alt="SUAP">
                     </span>
                 </div>
             </div>
@@ -82,10 +82,12 @@
                     </div>
                 </div>
 
+                <p id="mensagemErro" class="mensagem-erro" aria-live="polite"></p>
                 <button type="submit" class="botao-cadastrar">Criar Conta</button>
             </form>
         </section>
     </main>
+    <script src="/shared/api.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

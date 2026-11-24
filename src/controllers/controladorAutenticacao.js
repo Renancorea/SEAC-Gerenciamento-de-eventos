@@ -1,4 +1,9 @@
-import { login, logout } from "../services/servicoAutenticacao.js";
+import {
+    login,
+    logout,
+    extrairToken,
+    exigirAutenticacao
+} from "../services/servicoAutenticacao.js";
 
 export async function Login(requisicao, resposta) {
     try {
@@ -19,11 +24,7 @@ export async function Login(requisicao, resposta) {
 
 export async function Logout(requisicao, resposta) {
     try {
-        const authHeader = requisicao.headers.authorization;
-        const token = authHeader?.startsWith("Bearer ")
-            ? authHeader.substring(7)
-            : (requisicao.body?.token || requisicao.query?.token);
-
+        const token = extrairToken(requisicao) || requisicao.body?.token;
         await logout(token);
 
         return resposta.status(200).json({
@@ -37,8 +38,15 @@ export async function Logout(requisicao, resposta) {
 }
 
 export async function SessaoAtual(requisicao, resposta) {
-    return resposta.status(200).json({
-        mensagem: "Sessão ativa",
-        usuario: requisicao.usuario
-    });
+    try {
+        const usuario = await exigirAutenticacao(requisicao);
+        return resposta.status(200).json({
+            mensagem: "Sessão ativa",
+            usuario
+        });
+    } catch (erro) {
+        return resposta.status(erro.status || 401).json({
+            mensagem: erro.message || "Falha ao validar sessão."
+        });
+    }
 }

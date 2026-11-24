@@ -5,30 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEAC - Login</title>
-    <link rel="icon" type="image/png" href="../imagens/LOGO.png">
+    <link rel="icon" type="image/png" href="/assets/LOGO.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-
     <header class="cabecalho">
-        <div class="logo-seac">
-            <img src="../imagens/SE AC.png" alt="Logo SEAC">
-        </div>
+        <a href="/inicio/" class="logo-seac" aria-label="Página inicial SEAC">
+            <img src="/assets/logoSeacTexto.png" alt="Logo SEAC">
+        </a>
 
-      <nav class="acoes">
-    <a href="../login/" class="link-entrar">Entrar</a>
-    <a href="../cadastro/" class="botao-topo">Cadastre-se</a>
-</nav>
+        <nav class="acoes">
+            <a href="/login/" class="link-entrar">Entrar</a>
+            <a href="/cadastro/" class="botao-topo">Cadastre-se</a>
+        </nav>
     </header>
 
-  
     <main class="login-container">
-
-        
         <section class="lado-esquerdo">
-
             <div class="circulo circulo-1"></div>
             <div class="circulo circulo-2"></div>
             <div class="circulo circulo-3"></div>
@@ -45,153 +39,90 @@
 
                 <p>— Paulo Freire</p>
             </div>
-
-
         </section>
 
-
-
         <section class="lado-direito">
-
             <div class="formulario">
-
                 <h2>Bem-vindo de volta!</h2>
 
                 <p class="subtitulo">
                     Faça seu login para continuar
                 </p>
 
-
-
                 <div class="tipos">
+                    <div class="indicador"></div>
 
-                       <div class="indicador"></div>
-
-                    <button
-                        type="button"
-                        id="btnParticipante"
-                        class="tipo ativo">
+                    <button type="button" id="btnParticipante" class="tipo ativo">
                         Participante
                     </button>
 
-                    <button
-                        type="button"
-                        id="btnOrganizador"
-                        class="tipo">
+                    <button type="button" id="btnOrganizador" class="tipo">
                         Organizador
                     </button>
-
                 </div>
 
-
-       
-                <label id="labelIdentificacao">
+                <label id="labelIdentificacao" for="identificacao">
                     Matrícula
                 </label>
 
-                <input
-                    type="text"
-                    id="identificacao"
-                    placeholder="Digite sua matrícula"
-                >
+                <input type="text" id="identificacao" placeholder="Digite sua matrícula">
 
-
-           
-                <label>
+                <label for="senha">
                     Senha
                 </label>
 
                 <div class="campo-senha">
-
-                    <input
-                        type="password"
-                        id="senha"
-                        autocomplete="current-password"
-                        placeholder="Digite sua senha"
-                    >
-
-                    <span>👁</span>
-
+                    <input type="password" id="senha" autocomplete="current-password" placeholder="Digite sua senha">
+                    <span id="toggleSenha" title="Mostrar/ocultar senha">👁</span>
                 </div>
 
-
-            
-                <a href="#" class="esqueci">
+                <a href="#" class="esqueci" id="linkEsqueci">
                     Esqueceu sua senha?
                 </a>
 
+                <p id="mensagemErro" class="mensagem-erro" aria-live="polite"></p>
 
-            
                 <button type="button" class="botao-entrar">
                     Entrar
                 </button>
 
-
-        
                 <div class="separador">
-
                     <span></span>
-
                     <p>ou</p>
-
                     <span></span>
-
                 </div>
 
-
-             
                 <div class="login-opcoes">
-
-                    <button type="button" class="opcao-social">
-                        <img
-                            src="../imagens/google.png"
-                            alt="Google"
-                        >
+                    <button type="button" class="opcao-social" data-social="Google">
+                        <img src="/assets/logoGoogle.png" alt="Google">
                     </button>
 
-                    <button type="button" class="opcao-social">
-                        <img
-                            src="../imagens/suap.ifrr.edu.br 1.png"
-                            alt="SUAP"
-                        >
+                    <button type="button" class="opcao-social" data-social="SUAP">
+                        <img src="/assets/iconSuapTexto.png" alt="SUAP">
                     </button>
-
                 </div>
 
-
-     
                 <p class="texto-cadastro">
                     Ainda não possui uma conta?
                 </p>
 
-                <a
-                    href="../cadastro/"
-                    class="botao-criar-conta">
+                <a href="/cadastro/" class="botao-criar-conta">
                     Criar uma conta
                 </a>
-
             </div>
-
         </section>
-
     </main>
 
-
-  
     <footer class="rodape">
-
         <span>
             Instituto Federal de Educação, Ciência e Tecnologia do Ceará
         </span>
-
         <span>
             SEAC - Sistema de Eventos Acadêmicos
         </span>
-
     </footer>
 
-
-<script src="login.js"></script>
-
+    <script src="/shared/api.js"></script>
+    <script src="login.js"></script>
 </body>
 </html>

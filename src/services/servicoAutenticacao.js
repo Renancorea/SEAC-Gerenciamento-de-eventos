@@ -116,3 +116,50 @@ export async function verificarSessao(token) {
         adm: Number(u.tipo) === 0 ? Boolean(u.adm) : false
     };
 }
+
+export function extrairToken(requisicao) {
+    const authHeader = requisicao.headers?.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        return authHeader.substring(7).trim();
+    }
+    if (requisicao.query?.token) {
+        return String(requisicao.query.token).trim();
+    }
+    return null;
+}
+
+export async function exigirAutenticacao(requisicao, opcoes = {}) {
+    const token = extrairToken(requisicao);
+    if (!token) {
+        const erro = new Error("Autenticação necessária. Faça login para continuar.");
+        erro.status = 401;
+        throw erro;
+    }
+
+    const usuario = await verificarSessao(token);
+    if (!usuario) {
+        const erro = new Error("Sessão inválida ou expirada. Faça login novamente.");
+        erro.status = 401;
+        throw erro;
+    }
+
+    if (opcoes.organizador && Number(usuario.tipo) !== 0) {
+        const erro = new Error("Acesso restrito a organizadores.");
+        erro.status = 403;
+        throw erro;
+    }
+
+    if (opcoes.admin && (Number(usuario.tipo) !== 0 || !usuario.adm)) {
+        const erro = new Error("Acesso restrito a administradores.");
+        erro.status = 403;
+        throw erro;
+    }
+
+    return usuario;
+}
+
+export async function obterUsuarioOpcional(requisicao) {
+    const token = extrairToken(requisicao);
+    if (!token) return null;
+    return await verificarSessao(token).catch(() => null);
+}

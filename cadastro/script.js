@@ -2,6 +2,13 @@ const formulario = document.getElementById("formCadastro");
 const identificacao = document.getElementById("identificacao");
 const rotuloIdentificacao = document.getElementById("rotulo-identificacao");
 const opcoesTipo = document.querySelectorAll('input[name="tipo"]');
+const mensagemErro = document.getElementById("mensagemErro");
+
+function mostrarMensagem(texto) {
+    if (mensagemErro) {
+        mensagemErro.textContent = texto || "";
+    }
+}
 
 function obterTipoSelecionado() {
     return document.querySelector('input[name="tipo"]:checked')?.value || "participante";
@@ -19,61 +26,67 @@ function atualizarIdentificacao() {
 opcoesTipo.forEach((opcao) => opcao.addEventListener("change", atualizarIdentificacao));
 atualizarIdentificacao();
 
-formulario.addEventListener("submit", function (event) {
+formulario.addEventListener("submit", async function (event) {
     event.preventDefault();
+    mostrarMensagem("");
 
     const nome = document.getElementById("nome").value.trim();
     const identificacaoValor = identificacao.value.trim();
     const email = document.getElementById("email").value.trim().toLowerCase();
     const tipoValor = obterTipoSelecionado();
+    const tipoNumerico = tipoValor === "organizador" ? 0 : 1;
     const senha = document.getElementById("senha").value;
     const confirmar = document.getElementById("confirmar").value;
 
     if (!nome || !identificacaoValor || !email || !senha || !confirmar) {
-        alert("Preencha todos os campos para criar sua conta.");
+        mostrarMensagem("Preencha todos os campos para criar sua conta.");
         return;
     }
     if (senha.length < 6) {
-        alert("A senha deve ter pelo menos 6 caracteres.");
+        mostrarMensagem("A senha deve ter pelo menos 6 caracteres.");
         return;
     }
     if (senha !== confirmar) {
-        alert("As senhas não coincidem.");
+        mostrarMensagem("As senhas não coincidem.");
         return;
     }
 
-    const usuarios = JSON.parse(localStorage.getItem("seacUsuarios") || "[]");
-    const identificacaoExiste = usuarios.some(usuario =>
-        usuario.tipo === tipoValor &&
-        usuario.identificacao.toLowerCase() === identificacaoValor.toLowerCase()
-    );
-    const emailExiste = usuarios.some(usuario => usuario.email.toLowerCase() === email);
+    const botao = formulario.querySelector(".botao-cadastrar");
+    if (botao) botao.disabled = true;
 
-    if (identificacaoExiste) {
-        alert(tipoValor === "organizador"
-            ? "Já existe uma conta com esse SIAPE."
-            : "Já existe uma conta com essa matrícula.");
-        return;
+    try {
+        const payload = {
+            nome,
+            email,
+            tipo: tipoNumerico,
+            senha
+        };
+
+        if (tipoNumerico === 0) {
+            payload.siape = identificacaoValor;
+        } else {
+            payload.matricula = identificacaoValor;
+        }
+
+        await SEACApi.apiRequest("/usuarios/cadastrar", {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+
+        const loginRes = await SEACApi.apiRequest("/auth/login", {
+            method: "POST",
+            body: JSON.stringify({
+                identificador: identificacaoValor,
+                senha,
+                tipo: tipoNumerico
+            })
+        });
+
+        SEACApi.saveSession(loginRes.token, loginRes.usuario);
+        window.location.href = tipoNumerico === 0 ? "/organizador/" : "/participante/";
+    } catch (erro) {
+        mostrarMensagem(erro.message || "Erro ao criar conta.");
+    } finally {
+        if (botao) botao.disabled = false;
     }
-    if (emailExiste) {
-        alert("Já existe uma conta cadastrada com esse e-mail.");
-        return;
-    }
-
-    const novoUsuario = { nome, identificacao: identificacaoValor, email, tipo: tipoValor, senha };
-    usuarios.push(novoUsuario);
-    localStorage.setItem("seacUsuarios", JSON.stringify(usuarios));
-    sessionStorage.setItem("seacUsuarioLogado", JSON.stringify({
-        nome: novoUsuario.nome,
-        identificacao: novoUsuario.identificacao,
-        email: novoUsuario.email,
-        tipo: novoUsuario.tipo
-    }));
-
-    // Compatibilidade com partes anteriores do protótipo.
-    localStorage.setItem("seacNomeUsuario", nome);
-    localStorage.setItem("seacUsuario", identificacaoValor);
-    localStorage.setItem("seacTipoUsuario", tipoValor);
-
-    window.location.href = tipoValor === "organizador" ? "../organizador/" : "../participante/";
 });

@@ -1,15 +1,16 @@
 (function (global) {
-    const API_BASE = "/api";
+    // Centralize aqui a URL base da API ao hospedar frontend e backend separadamente
+    const API_BASE = global.SEAC_API_BASE || "/api";
     const TOKEN_KEY = "seac_token";
     const USER_KEY = "seac_usuario";
 
     function getToken() {
-        return localStorage.getItem(TOKEN_KEY) || "";
+        return sessionStorage.getItem(TOKEN_KEY) || "";
     }
 
     function getStoredUser() {
         try {
-            const raw = localStorage.getItem(USER_KEY);
+            const raw = sessionStorage.getItem(USER_KEY);
             return raw ? JSON.parse(raw) : null;
         } catch {
             return null;
@@ -17,13 +18,13 @@
     }
 
     function saveSession(token, usuario) {
-        if (token) localStorage.setItem(TOKEN_KEY, token);
-        if (usuario) localStorage.setItem(USER_KEY, JSON.stringify(usuario));
+        if (token) sessionStorage.setItem(TOKEN_KEY, token);
+        if (usuario) sessionStorage.setItem(USER_KEY, JSON.stringify(usuario));
     }
 
     function clearSession() {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(USER_KEY);
     }
 
     async function apiRequest(endpoint, options = {}) {
@@ -92,7 +93,7 @@
                 });
             }
         } catch {
-            // Mesmo se o servidor já tiver encerrado a sessão, limpa localmente
+            // Ignora erro caso a sessão já tenha expirado no servidor
         } finally {
             clearSession();
         }
@@ -133,12 +134,85 @@
         };
     }
 
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(new Error("Não foi possível ler o arquivo selecionado."));
-            reader.readAsDataURL(file);
+    function formatarTipo(tipo) {
+        const mapa = {
+            cientifico: "Científico",
+            academico: "Acadêmico",
+            cultural: "Cultural"
+        };
+        const chave = String(tipo || "").toLowerCase();
+        return mapa[chave] || (tipo ? String(tipo) : "Evento");
+    }
+
+    function renderizarCardsEventos(gradeEl, eventos, aoAbrir) {
+        gradeEl.innerHTML = "";
+        eventos.forEach((ev, idx) => {
+            const { dia, mes } = getDayAndMonth(ev.data);
+            const card = document.createElement("article");
+            card.className = "evento-card";
+            card.tabIndex = 0;
+            card.setAttribute("role", "link");
+            card.setAttribute("aria-label", `Abrir detalhes de ${ev.nome}`);
+
+            const capa = document.createElement("div");
+            capa.className = `imagem-evento floresta-${(idx % 4) + 1}`;
+            if (ev.imagem) {
+                capa.style.backgroundImage = `url("${encodeURI(ev.imagem)}")`;
+            }
+
+            const etiqueta = document.createElement("span");
+            etiqueta.className = "etiqueta-tipo";
+            etiqueta.textContent = formatarTipo(ev.tipo);
+
+            const badgeData = document.createElement("span");
+            badgeData.className = "data-evento";
+            const strongDia = document.createElement("strong");
+            strongDia.textContent = dia;
+            const smallMes = document.createElement("small");
+            smallMes.textContent = mes;
+            badgeData.append(strongDia, smallMes);
+
+            capa.append(etiqueta, badgeData);
+
+            const conteudo = document.createElement("div");
+            conteudo.className = "conteudo-evento";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = ev.nome || "Evento";
+
+            const organizador = document.createElement("p");
+            organizador.className = "organizador";
+            organizador.textContent = ev.organizadorNome || "Organizador IFCE";
+
+            const local = document.createElement("span");
+            local.className = "local-evento";
+            const iconeLocal = document.createElement("img");
+            iconeLocal.src = "/assets/iconLocal.png";
+            iconeLocal.alt = "Local";
+            local.append(iconeLocal, document.createTextNode(` ${ev.local || "IFCE"}`));
+
+            const dados = document.createElement("div");
+            dados.className = "dados-evento";
+            const spanInscritos = document.createElement("span");
+            spanInscritos.textContent = `${ev.quantidadeInscritos ?? 0} inscritos`;
+            const spanVagas = document.createElement("span");
+            spanVagas.textContent = `${ev.assentosDisponiveis ?? ev.assentos ?? 0} vagas`;
+            dados.append(spanInscritos, spanVagas);
+
+            conteudo.append(titulo, organizador, local, dados);
+            card.append(capa, conteudo);
+
+            if (typeof aoAbrir === "function") {
+                card.addEventListener("click", () => aoAbrir(ev));
+                card.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        aoAbrir(ev);
+                    }
+                });
+            }
+
+            gradeEl.appendChild(card);
         });
     }
 
@@ -154,6 +228,7 @@
         escapeHtml,
         formatDatePtBr,
         getDayAndMonth,
-        fileToBase64
+        formatarTipo,
+        renderizarCardsEventos
     };
 })(window);

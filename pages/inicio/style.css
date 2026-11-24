@@ -283,6 +283,7 @@ main {
     overflow: hidden;
     box-shadow: 0 3px 12px rgba(0,0,0,.08);
     min-width: 0;
+    cursor: pointer;
     transition: transform .2s, box-shadow .2s;
 }
 
@@ -305,19 +306,14 @@ main {
     border-radius: 12px 12px 0 0;
 }
 
-.floresta-1 {
-    background-image: url("../imagens/floresta.png");
+.floresta-1,
+.floresta-2,
+.floresta-3,
+.floresta-4 {
+    background-image: url("/assets/fundoFloresta.png");
 }
-.floresta-2 {
-    background-image: url("../imagens/floresta.png");
-}
-.floresta-3 {
-    background-image: url("../imagens/floresta.png");
-}
-.floresta-4 { 
-    background-image: url("../imagens/floresta.png");
- }
 
+.etiqueta-tipo,
 .tipo-evento {
     position: absolute;
 

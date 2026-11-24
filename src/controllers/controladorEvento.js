@@ -9,12 +9,14 @@ import {
     salvarImagemEvento,
     listarImagensEvento
 } from "../services/servicoEvento.js";
+import { exigirAutenticacao } from "../services/servicoAutenticacao.js";
 
 export async function CadastrarEvento(requisicao, resposta) {
     try {
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
         const evento = await cadastrarEvento({
             ...requisicao.body,
-            idOrganizador: requisicao.usuario.usuarioId
+            idOrganizador: usuario.usuarioId
         });
 
         return resposta.status(201).json({
@@ -23,7 +25,7 @@ export async function CadastrarEvento(requisicao, resposta) {
         });
 
     } catch (erro) {
-        return resposta.status(400).json({
+        return resposta.status(erro.status || 400).json({
             mensagem: erro.message
         });
     }
@@ -75,11 +77,9 @@ export async function ListarDetalhesEventos(requisicao, resposta) {
 
 export async function EditarEvento(requisicao, resposta) {
     try {
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
         const idEvento = Number(requisicao.params.id);
-        const idOrganizador = requisicao.usuario.usuarioId;
-        const isAdmin = Boolean(requisicao.usuario.adm);
-
-        const eventoEditado = await editarEvento(idEvento, idOrganizador, requisicao.body, isAdmin);
+        const eventoEditado = await editarEvento(idEvento, usuario.usuarioId, requisicao.body, Boolean(usuario.adm));
 
         return resposta.status(200).json({
             mensagem: "Evento editado com sucesso",
@@ -87,7 +87,7 @@ export async function EditarEvento(requisicao, resposta) {
         });
 
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });
@@ -96,18 +96,17 @@ export async function EditarEvento(requisicao, resposta) {
 
 export async function DeletarEvento(requisicao, resposta) {
     try {
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
         const idEvento = Number(requisicao.params.id);
-        const idOrganizador = requisicao.usuario.usuarioId;
-        const isAdmin = Boolean(requisicao.usuario.adm);
 
-        await deletarEvento(idEvento, idOrganizador, isAdmin);
+        await deletarEvento(idEvento, usuario.usuarioId, Boolean(usuario.adm));
 
         return resposta.status(200).json({
             mensagem: "Evento deletado com sucesso"
         });
 
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });
@@ -149,12 +148,13 @@ export async function FiltrarEventos(requisicao, resposta) {
 
 export async function UploadImagemEvento(requisicao, resposta) {
     try {
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
         const idEvento = Number(requisicao.params.id);
         const imagem = await salvarImagemEvento(
             idEvento,
-            requisicao.usuario.usuarioId,
+            usuario.usuarioId,
             requisicao.body,
-            Boolean(requisicao.usuario.adm)
+            Boolean(usuario.adm)
         );
 
         return resposta.status(201).json({
@@ -162,7 +162,7 @@ export async function UploadImagemEvento(requisicao, resposta) {
             imagem
         });
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });

@@ -1,49 +1,75 @@
-const sessao = sessionStorage.getItem("seacUsuarioLogado");
-if (!sessao) {
-    window.location.replace("../login/");
-} else {
-    const usuario = JSON.parse(sessao);
-    if (usuario.tipo !== "participante") {
-        window.location.replace(usuario.tipo === "organizador" ? "../organizador/" : "../participante/");
-    } else {
-        document.getElementById("nomeUsuario").textContent = `Olá, ${usuario.nome}`;
-    }
-}
-
-function sairDaConta() {
-    sessionStorage.removeItem("seacUsuarioLogado");
-    window.location.href = "../login/";
-}
-document.getElementById("sair").addEventListener("click", sairDaConta);
-document.getElementById("linkSair")?.addEventListener("click", function(event) { event.preventDefault(); sairDaConta(); });
-
-document.querySelectorAll('.evento-card').forEach(card => {
-  const abrir = () => { window.location.href = `detalhes.html?id=${encodeURIComponent(card.dataset.eventoId || 'evento-seac-01')}`; };
-  card.addEventListener('click', abrir);
-  card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abrir(); } });
-});
-
 const busca = document.getElementById("campoBusca");
 const tipo = document.getElementById("filtroTipo");
 const ordem = document.getElementById("ordenacao");
 const grade = document.getElementById("gradeEventos");
-function filtrarEventos() {
-  const termo = (busca?.value || "").toLocaleLowerCase("pt-BR");
-  const selecionado = tipo?.value || "todos";
-  let cards = Array.from(grade.querySelectorAll(".evento-card"));
-  cards.forEach(card => {
-    const texto = card.textContent.toLocaleLowerCase("pt-BR");
-    const correspondeTipo = selecionado === "todos" || texto.includes(selecionado);
-    card.style.display = texto.includes(termo) && correspondeTipo ? "" : "none";
-  });
-  const visiveis = cards.filter(card => card.style.display !== "none").length;
-  document.getElementById("contadorEventos").textContent = `${visiveis} Eventos encontrados`;
-  document.getElementById("semResultados").style.display = visiveis ? "none" : "block";
+const contadorEventos = document.getElementById("contadorEventos");
+const semResultados = document.getElementById("semResultados");
+
+let todosEventos = [];
+
+function abrirDetalhes(ev) {
+    window.location.href = `detalhes.html?id=${encodeURIComponent(ev.eventoId)}`;
 }
+
+function filtrarEventos() {
+    const termo = (busca?.value || "").trim().toLowerCase();
+    const selecionado = tipo?.value || "todos";
+
+    let lista = todosEventos.filter((ev) => {
+        const correspondeTipo = selecionado === "todos" || String(ev.tipo || "").toLowerCase() === selecionado;
+        const texto = `${ev.nome || ""} ${ev.organizadorNome || ""} ${ev.local || ""} ${ev.categoria || ""}`.toLowerCase();
+        return (!termo || texto.includes(termo)) && correspondeTipo;
+    });
+
+    lista.sort((a, b) => {
+        const dataA = new Date(a.data);
+        const dataB = new Date(b.data);
+        return ordem?.value === "desc" ? dataB - dataA : dataA - dataB;
+    });
+
+    SEACApi.renderizarCardsEventos(grade, lista, abrirDetalhes);
+    contadorEventos.textContent = `${lista.length} ${lista.length === 1 ? "Evento encontrado" : "Eventos encontrados"}`;
+    semResultados.style.display = lista.length ? "none" : "block";
+}
+
+async function sairDaConta() {
+    await SEACApi.logout();
+    window.location.href = "/login/";
+}
+
+async function inicializar() {
+    const usuario = await SEACApi.validateSession();
+    if (!usuario) {
+        window.location.replace("/login/");
+        return;
+    }
+
+    if (Number(usuario.tipo) !== 1) {
+        window.location.replace("/organizador/");
+        return;
+    }
+
+    document.getElementById("nomeUsuario").textContent = `Olá, ${usuario.nome}`;
+
+    try {
+        const res = await SEACApi.apiRequest("/eventos");
+        todosEventos = res.eventos || [];
+    } catch (erro) {
+        todosEventos = [];
+        semResultados.textContent = erro.message || "Não foi possível carregar os eventos.";
+    }
+
+    filtrarEventos();
+}
+
+document.getElementById("sair")?.addEventListener("click", sairDaConta);
+document.getElementById("linkSair")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    sairDaConta();
+});
+
 busca?.addEventListener("input", filtrarEventos);
 tipo?.addEventListener("change", filtrarEventos);
-ordem?.addEventListener("change", () => {
- const cards = Array.from(grade.querySelectorAll(".evento-card"));
- if (ordem.value === "desc") cards.reverse();
- cards.forEach(card => grade.appendChild(card));
-});
+ordem?.addEventListener("change", filtrarEventos);
+
+inicializar();

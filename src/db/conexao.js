@@ -5,14 +5,14 @@ import bcrypt from "bcryptjs";
 const configConexao = {
     host: process.env.DB_HOST || "localhost",
     port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER || "renan",
-    password: process.env.DB_PASSWORD || "Renan@1234",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "seac",
     connectTimeout: 2000
 };
 
 // Armazenamento em memória para execução contínua caso o MySQL externo esteja indisponível
-let usarBancoEmMemoria = false;
+let usarBancoEmMemoria = !process.env.DB_HOST;
 
 const usuarios = [
     {

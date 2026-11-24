@@ -5,17 +5,19 @@ import {
     editarAcao,
     deletarAcao
 } from "../services/servicoAcao.js";
+import { exigirAutenticacao } from "../services/servicoAutenticacao.js";
 
 export async function CadastrarAcao(requisicao, resposta) {
     try {
-        const acao = await cadastrarAcao(requisicao.body, requisicao.usuario);
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
+        const acao = await cadastrarAcao(requisicao.body, usuario);
 
         return resposta.status(201).json({
             mensagem: "Ação cadastrada com sucesso",
             acao
         });
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não foi encontrado") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não foi encontrado") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });
@@ -57,15 +59,16 @@ export async function BuscarAcaoPorId(requisicao, resposta) {
 
 export async function EditarAcao(requisicao, resposta) {
     try {
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
         const id = Number(requisicao.params.id);
-        const acao = await editarAcao(id, requisicao.body, requisicao.usuario);
+        const acao = await editarAcao(id, requisicao.body, usuario);
 
         return resposta.status(200).json({
             mensagem: "Ação editada com sucesso",
             acao
         });
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrada") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrada") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });
@@ -74,14 +77,15 @@ export async function EditarAcao(requisicao, resposta) {
 
 export async function DeletarAcao(requisicao, resposta) {
     try {
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
         const id = Number(requisicao.params.id);
-        await deletarAcao(id, requisicao.usuario);
+        await deletarAcao(id, usuario);
 
         return resposta.status(200).json({
             mensagem: "Ação deletada com sucesso"
         });
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrada") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrada") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });

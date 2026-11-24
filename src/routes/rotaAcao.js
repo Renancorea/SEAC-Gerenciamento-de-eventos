@@ -6,14 +6,13 @@ import {
     EditarAcao,
     DeletarAcao
 } from "../controllers/controladorAcao.js";
-import { autenticarUsuario, exigirOrganizador } from "../middlewares/autenticacao.js";
 
 const router = Router();
 
-router.post("/", autenticarUsuario, exigirOrganizador, CadastrarAcao);
+router.post("/", CadastrarAcao);
 router.get("/evento/:eventoId", ListarAcoesPorEvento);
 router.get("/:id", BuscarAcaoPorId);
-router.put("/:id", autenticarUsuario, exigirOrganizador, EditarAcao);
-router.delete("/:id", autenticarUsuario, exigirOrganizador, DeletarAcao);
+router.put("/:id", EditarAcao);
+router.delete("/:id", DeletarAcao);
 
 export default router;

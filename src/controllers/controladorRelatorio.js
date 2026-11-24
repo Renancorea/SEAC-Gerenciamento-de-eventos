@@ -3,9 +3,11 @@ import {
     relatorioGeralEventos,
     relatorioUsuariosEvento
 } from "../services/servicoRelatorio.js";
+import { exigirAutenticacao } from "../services/servicoAutenticacao.js";
 
 export async function RelatorioGeralUsuarios(requisicao, resposta) {
     try {
+        await exigirAutenticacao(requisicao, { admin: true });
         const relatorio = await relatorioGeralUsuarios();
 
         return resposta.status(200).json({
@@ -14,7 +16,7 @@ export async function RelatorioGeralUsuarios(requisicao, resposta) {
         });
 
     } catch (erro) {
-        return resposta.status(400).json({
+        return resposta.status(erro.status || 400).json({
             mensagem: erro.message
         });
     }
@@ -22,6 +24,7 @@ export async function RelatorioGeralUsuarios(requisicao, resposta) {
 
 export async function RelatorioGeralEventos(requisicao, resposta) {
     try {
+        await exigirAutenticacao(requisicao, { organizador: true });
         const relatorio = await relatorioGeralEventos();
 
         return resposta.status(200).json({
@@ -30,7 +33,7 @@ export async function RelatorioGeralEventos(requisicao, resposta) {
         });
 
     } catch (erro) {
-        return resposta.status(400).json({
+        return resposta.status(erro.status || 400).json({
             mensagem: erro.message
         });
     }
@@ -38,7 +41,8 @@ export async function RelatorioGeralEventos(requisicao, resposta) {
 
 export async function RelatorioUsuariosEvento(requisicao, resposta) {
     try {
-        const idEvento = Number(requisicao.params.eventoId || requisicao.params.usuarioId || requisicao.query.eventoId);
+        const usuario = await exigirAutenticacao(requisicao, { organizador: true });
+        const idEvento = Number(requisicao.params.eventoId || requisicao.query.eventoId);
 
         if (!idEvento) {
             return resposta.status(400).json({
@@ -46,7 +50,7 @@ export async function RelatorioUsuariosEvento(requisicao, resposta) {
             });
         }
 
-        const relatorio = await relatorioUsuariosEvento(idEvento, requisicao.usuario);
+        const relatorio = await relatorioUsuariosEvento(idEvento, usuario);
 
         return resposta.status(200).json({
             mensagem: "Relatório de usuários do evento gerado com sucesso",
@@ -54,7 +58,7 @@ export async function RelatorioUsuariosEvento(requisicao, resposta) {
         });
 
     } catch (erro) {
-        const status = erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400);
+        const status = erro.status || (erro.message.includes("não autorizado") ? 403 : (erro.message.includes("não encontrado") ? 404 : 400));
         return resposta.status(status).json({
             mensagem: erro.message
         });

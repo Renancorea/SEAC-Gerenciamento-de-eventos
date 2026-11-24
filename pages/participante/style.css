@@ -37,7 +37,7 @@ a{color:inherit}
 .grade-eventos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .evento-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 3px 12px #00000012;min-width:0;cursor:pointer}
 .imagem-evento{position:relative;width:100%;height:88px;background-size:cover;background-position:center;overflow:hidden}
-.floresta-1,.floresta-2,.floresta-3,.floresta-4{background-image:url("../imagens/floresta.png")}
+.floresta-1,.floresta-2,.floresta-3,.floresta-4{background-image:url("/assets/fundoFloresta.png")}
 .etiqueta-tipo{position:absolute;top:5px;right:5px;padding:2px 6px;border:1px solid white;border-radius:12px;background:#0006;color:white;font-size:8px}
 .data-evento{position:absolute;top:5px;left:5px;width:26px;height:30px;background:white;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#17251c;box-shadow:0 2px 5px #0003}
 .data-evento strong{font-size:11px;line-height:12px}.data-evento small{font-size:8px}

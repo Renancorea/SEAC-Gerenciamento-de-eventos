@@ -1,52 +1,28 @@
 import fs from "fs";
 import path from "path";
-import puppeteer from "puppeteer";
 import { executar } from "../db/conexao.js";
 
-async function gerarPdfRelatorio(html, nomeArquivo) {
+function escapeHtml(texto) {
+    return String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+async function gerarArquivoRelatorio(html, nomeArquivo) {
     const pastaRelatorios = path.resolve("./relatorios");
     if (!fs.existsSync(pastaRelatorios)) {
         fs.mkdirSync(pastaRelatorios, { recursive: true });
     }
 
-    let caminho = path.join(pastaRelatorios, `${nomeArquivo}.pdf`);
-    let formato = "pdf";
-
-    try {
-        const gerarPdf = async () => {
-            const browser = await puppeteer.launch({
-                headless: true,
-                args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
-            });
-            try {
-                const page = await browser.newPage();
-                await page.setContent(html, { waitUntil: "networkidle0" });
-                await page.pdf({
-                    path: caminho,
-                    format: "A4",
-                    landscape: true,
-                    printBackground: true
-                });
-            } finally {
-                await browser.close();
-            }
-        };
-
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Timeout ao inicializar Chromium do Puppeteer")), 2000)
-        );
-
-        await Promise.race([gerarPdf(), timeoutPromise]);
-    } catch (erro) {
-        console.warn("[SEAC] Puppeteer indisponível para relatório. Salvando em HTML:", erro.message);
-        caminho = path.join(pastaRelatorios, `${nomeArquivo}.html`);
-        formato = "html";
-        fs.writeFileSync(caminho, html, "utf-8");
-    }
+    const caminho = path.join(pastaRelatorios, `${nomeArquivo}.html`);
+    fs.writeFileSync(caminho, html, "utf-8");
 
     return {
         caminho,
-        formato,
+        formato: "html",
         urlDownload: `/relatorios/${path.basename(caminho)}`
     };
 }
@@ -93,22 +69,22 @@ export async function relatorioGeralUsuarios() {
                     <tbody>
                         ${usuarios.map(u => `
                             <tr>
-                                <td>${u.usuarioId}</td>
-                                <td>${u.nome}</td>
+                                <td>${escapeHtml(u.usuarioId)}</td>
+                                <td>${escapeHtml(u.nome)}</td>
                                 <td>${Number(u.tipo) === 0 ? "Organizador" : "Participante"}</td>
-                                <td>${u.matricula ? `Matrícula: ${u.matricula}` : `SIAPE: ${u.siape}`}</td>
-                                <td>${u.email}</td>
+                                <td>${u.matricula ? `Matrícula: ${escapeHtml(u.matricula)}` : `SIAPE: ${escapeHtml(u.siape)}`}</td>
+                                <td>${escapeHtml(u.email)}</td>
                             </tr>
                         `).join("")}
                     </tbody>
                 </table>
-                <div class="codigo">Código de autenticidade: <strong>${codigo}</strong></div>
+                <div class="codigo">Código de autenticidade: <strong>${escapeHtml(codigo)}</strong></div>
             </div>
         </body>
         </html>
     `;
 
-    const arquivoInfo = await gerarPdfRelatorio(html, codigo);
+    const arquivoInfo = await gerarArquivoRelatorio(html, codigo);
 
     return {
         codigo,
@@ -170,24 +146,24 @@ export async function relatorioGeralEventos() {
                     <tbody>
                         ${eventos.map(e => `
                             <tr>
-                                <td>${e.eventoId}</td>
-                                <td>${e.nome}</td>
-                                <td>${e.tipo || ""} / ${e.categoria || ""}</td>
-                                <td>${e.data} ${e.horario}</td>
-                                <td>${e.local}</td>
-                                <td>${e.assentos}</td>
-                                <td>${e.cargaHoraria}h</td>
+                                <td>${escapeHtml(e.eventoId)}</td>
+                                <td>${escapeHtml(e.nome)}</td>
+                                <td>${escapeHtml(e.tipo || "")} / ${escapeHtml(e.categoria || "")}</td>
+                                <td>${escapeHtml(e.data)} ${escapeHtml(e.horario)}</td>
+                                <td>${escapeHtml(e.local)}</td>
+                                <td>${escapeHtml(e.assentos)}</td>
+                                <td>${escapeHtml(e.cargaHoraria)}h</td>
                             </tr>
                         `).join("")}
                     </tbody>
                 </table>
-                <div class="codigo">Código de autenticidade: <strong>${codigo}</strong></div>
+                <div class="codigo">Código de autenticidade: <strong>${escapeHtml(codigo)}</strong></div>
             </div>
         </body>
         </html>
     `;
 
-    const arquivoInfo = await gerarPdfRelatorio(html, codigo);
+    const arquivoInfo = await gerarArquivoRelatorio(html, codigo);
 
     return {
         codigo,
@@ -252,7 +228,7 @@ export async function relatorioUsuariosEvento(idEvento, usuarioSolicitante = nul
         <body>
             <div class="relatorio">
                 <h1>SEAC — Relatório de Participantes do Evento</h1>
-                <p><strong>Evento:</strong> ${evento.nome} | <strong>Data:</strong> ${evento.data} | <strong>Local:</strong> ${evento.local}</p>
+                <p><strong>Evento:</strong> ${escapeHtml(evento.nome)} | <strong>Data:</strong> ${escapeHtml(evento.data)} | <strong>Local:</strong> ${escapeHtml(evento.local)}</p>
                 <p><strong>Total de inscritos:</strong> ${inscritos.length}</p>
                 <table>
                     <thead>
@@ -266,21 +242,21 @@ export async function relatorioUsuariosEvento(idEvento, usuarioSolicitante = nul
                     <tbody>
                         ${inscritos.map(u => `
                             <tr>
-                                <td>${u.nome}</td>
-                                <td>${u.matricula ? `Matrícula: ${u.matricula}` : `SIAPE: ${u.siape}`}</td>
-                                <td>${u.email}</td>
+                                <td>${escapeHtml(u.nome)}</td>
+                                <td>${u.matricula ? `Matrícula: ${escapeHtml(u.matricula)}` : `SIAPE: ${escapeHtml(u.siape)}`}</td>
+                                <td>${escapeHtml(u.email)}</td>
                                 <td>${u.presente ? "Sim" : "Não"}</td>
                             </tr>
                         `).join("")}
                     </tbody>
                 </table>
-                <div class="codigo">Código de autenticidade: <strong>${codigo}</strong></div>
+                <div class="codigo">Código de autenticidade: <strong>${escapeHtml(codigo)}</strong></div>
             </div>
         </body>
         </html>
     `;
 
-    const arquivoInfo = await gerarPdfRelatorio(html, codigo);
+    const arquivoInfo = await gerarArquivoRelatorio(html, codigo);
 
     return {
         codigo,

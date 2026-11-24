@@ -1,7 +1,15 @@
 import fs from "fs";
 import path from "path";
-import puppeteer from "puppeteer";
 import { executar } from "../db/conexao.js";
+
+function escapeHtml(texto) {
+    return String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 
 export async function gerarCertificado(dados, usuarioSolicitante = null) {
     const uid = Number(dados.usuarioId || usuarioSolicitante?.usuarioId);
@@ -102,7 +110,7 @@ export async function gerarCertificado(dados, usuarioSolicitante = null) {
         <html lang="pt-BR">
         <head>
             <meta charset="UTF-8">
-            <title>Certificado - ${dadosEvento.nomeEvento}</title>
+            <title>Certificado - ${escapeHtml(dadosEvento.nomeEvento)}</title>
             <style>
                 @page { size: A4 landscape; margin: 0; }
                 body {
@@ -165,17 +173,17 @@ export async function gerarCertificado(dados, usuarioSolicitante = null) {
             <div class="certificado">
                 <h1>INSTITUTO FEDERAL DO CEARÁ — SEAC</h1>
                 <div class="texto">Certificamos que</div>
-                <div class="nome">${dadosEvento.nomeParticipante}</div>
-                <div class="identificacao">${identificador}</div>
+                <div class="nome">${escapeHtml(dadosEvento.nomeParticipante)}</div>
+                <div class="identificacao">${escapeHtml(identificador)}</div>
                 <div class="texto">
-                    participou com êxito do evento <span class="destaque">${dadosEvento.nomeEvento}</span>,
-                    realizado em ${dataFormatada}.
+                    participou com êxito do evento <span class="destaque">${escapeHtml(dadosEvento.nomeEvento)}</span>,
+                    realizado em ${escapeHtml(dataFormatada)}.
                 </div>
                 <div class="texto" style="margin-top: 15px;">
-                    Carga horária total: <strong>${dadosEvento.cargaHoraria} horas</strong>.
+                    Carga horária total: <strong>${escapeHtml(dadosEvento.cargaHoraria)} horas</strong>.
                 </div>
                 <div class="codigo">
-                    Código de autenticidade: <strong>${codigo}</strong>
+                    Código de autenticidade: <strong>${escapeHtml(codigo)}</strong>
                 </div>
             </div>
         </body>
@@ -187,45 +195,9 @@ export async function gerarCertificado(dados, usuarioSolicitante = null) {
         fs.mkdirSync(pastaCertificados, { recursive: true });
     }
 
-    let caminhoArquivo = path.join(pastaCertificados, `${codigo}.pdf`);
-    let formatoArquivo = "pdf";
-
-    try {
-        const gerarPdf = async () => {
-            const browser = await puppeteer.launch({
-                headless: true,
-                args: [
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu"
-                ]
-            });
-            try {
-                const page = await browser.newPage();
-                await page.setContent(html, { waitUntil: "networkidle0" });
-                await page.pdf({
-                    path: caminhoArquivo,
-                    format: "A4",
-                    landscape: true,
-                    printBackground: true
-                });
-            } finally {
-                await browser.close();
-            }
-        };
-
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Timeout ao inicializar Chromium do Puppeteer")), 2000)
-        );
-
-        await Promise.race([gerarPdf(), timeoutPromise]);
-    } catch (erroPuppeteer) {
-        console.warn("[SEAC] Puppeteer indisponível no ambiente. Gerando certificado em formato HTML:", erroPuppeteer.message);
-        caminhoArquivo = path.join(pastaCertificados, `${codigo}.html`);
-        formatoArquivo = "html";
-        fs.writeFileSync(caminhoArquivo, html, "utf-8");
-    }
+    const caminhoArquivo = path.join(pastaCertificados, `${codigo}.html`);
+    const formatoArquivo = "html";
+    fs.writeFileSync(caminhoArquivo, html, "utf-8");
 
     const insertRes = await executar(
         `INSERT INTO Certificado

@@ -341,7 +341,14 @@ input:focus {
 
     margin-top: -8px;
 
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+}
+
+.mensagem-erro {
+    min-height: 18px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #b91c1c;
 }
 
 
@@ -541,7 +548,7 @@ input:focus {
     height: 220px;
     margin: 25px auto 0;
 
-    background-image: url("../imagens/logo-seac-capelo.png");
+    background-image: url("/assets/LOGO.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;

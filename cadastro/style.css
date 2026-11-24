@@ -143,7 +143,8 @@ body {
 .campo input:focus { border: 2px solid var(--verde); box-shadow: 0 0 0 3px rgba(128,179,49,.12); }
 .campo-nome { margin-bottom: 17px; padding: 0 0; }
 .campo-nome input { margin: 0 -2px; width: calc(100% + 4px); }
-.grade-campos { display: grid; grid-template-columns: 1fr 1fr; column-gap: 25px; row-gap: 17px; padding: 0 0 23px; }
+.grade-campos { display: grid; grid-template-columns: 1fr 1fr; column-gap: 25px; row-gap: 17px; padding: 0 0 16px; }
+.mensagem-erro { min-height: 20px; margin-bottom: 12px; text-align: center; color: #b91c1c; font-size: 14px; font-weight: 400; }
 .botao-cadastrar {
     display: block;
     min-width: 202px;

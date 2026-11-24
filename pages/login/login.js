@@ -4,9 +4,17 @@ const indicador = document.querySelector(".indicador");
 const labelIdentificacao = document.getElementById("labelIdentificacao");
 const identificacao = document.getElementById("identificacao");
 const senha = document.getElementById("senha");
+const toggleSenha = document.getElementById("toggleSenha");
 const botaoEntrar = document.querySelector(".botao-entrar");
+const mensagemErro = document.getElementById("mensagemErro");
 
 let tipoUsuario = "participante";
+
+function mostrarMensagem(texto) {
+    if (mensagemErro) {
+        mensagemErro.textContent = texto || "";
+    }
+}
 
 function selecionarTipo(tipo) {
     tipoUsuario = tipo;
@@ -17,48 +25,61 @@ function selecionarTipo(tipo) {
     labelIdentificacao.textContent = participante ? "Matrícula" : "SIAPE";
     identificacao.placeholder = participante ? "Digite sua matrícula" : "Digite seu SIAPE";
     identificacao.value = "";
+    mostrarMensagem("");
     identificacao.focus();
 }
 
 btnParticipante.addEventListener("click", () => selecionarTipo("participante"));
 btnOrganizador.addEventListener("click", () => selecionarTipo("organizador"));
 
+toggleSenha?.addEventListener("click", () => {
+    senha.type = senha.type === "password" ? "text" : "password";
+});
+
+document.getElementById("linkEsqueci")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    mostrarMensagem("Recuperação de senha ainda não disponível no servidor.");
+});
+
+document.querySelectorAll(".opcao-social").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        const provedor = btn.dataset.social || "externo";
+        mostrarMensagem(`Login via ${provedor} ainda não está configurado no servidor.`);
+    });
+});
+
 botaoEntrar.addEventListener("click", entrar);
-[identificacao, senha].forEach(campo => campo.addEventListener("keydown", event => {
+[identificacao, senha].forEach((campo) => campo.addEventListener("keydown", (event) => {
     if (event.key === "Enter") entrar();
 }));
 
-function entrar() {
+async function entrar() {
     const id = identificacao.value.trim();
     const senhaPreenchida = senha.value;
 
     if (!id || !senhaPreenchida) {
-        alert("Preencha sua identificação e senha para entrar.");
+        mostrarMensagem("Preencha sua identificação e senha para entrar.");
         return;
     }
 
-    const usuarios = JSON.parse(localStorage.getItem("seacUsuarios") || "[]");
-    const usuario = usuarios.find(item =>
-        item.tipo === tipoUsuario &&
-        item.identificacao.toLowerCase() === id.toLowerCase() &&
-        item.senha === senhaPreenchida
-    );
+    mostrarMensagem("");
+    botaoEntrar.disabled = true;
 
-    if (!usuario) {
-        alert("Identificação, tipo de conta ou senha incorretos. Confira os dados ou faça seu cadastro.");
-        return;
+    try {
+        const res = await SEACApi.apiRequest("/auth/login", {
+            method: "POST",
+            body: JSON.stringify({
+                identificador: id,
+                senha: senhaPreenchida,
+                tipo: tipoUsuario === "organizador" ? 0 : 1
+            })
+        });
+
+        SEACApi.saveSession(res.token, res.usuario);
+        window.location.href = Number(res.usuario.tipo) === 0 ? "/organizador/" : "/participante/";
+    } catch (erro) {
+        mostrarMensagem(erro.message || "Identificação, tipo de conta ou senha incorretos.");
+    } finally {
+        botaoEntrar.disabled = false;
     }
-
-    sessionStorage.setItem("seacUsuarioLogado", JSON.stringify({
-        nome: usuario.nome,
-        identificacao: usuario.identificacao,
-        email: usuario.email,
-        tipo: usuario.tipo
-    }));
-
-    localStorage.setItem("seacNomeUsuario", usuario.nome);
-    localStorage.setItem("seacUsuario", usuario.identificacao);
-    localStorage.setItem("seacTipoUsuario", usuario.tipo);
-
-    window.location.href = usuario.tipo === "organizador" ? "../organizador/" : "../participante/";
 }
